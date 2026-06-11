@@ -41,26 +41,27 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final color = Color(widget.module.colorValue);
     final allCompleted = widget.module.allSubModulesCompleted;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
           _buildAppBar(context, color),
-          SliverToBoxAdapter(child: _buildModuleInfo(color)),
+          SliverToBoxAdapter(child: _buildModuleInfo(context, color)),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Topics',
                     style: TextStyle(
-                      color: AppColors.textPrimary,
+                      color: colors.textPrimary,
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
                     ),
@@ -103,7 +104,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
             sliver: SliverToBoxAdapter(
-              child: _buildQuizButton(color, allCompleted),
+              child: _buildQuizButton(context, color, allCompleted),
             ),
           ),
         ],
@@ -206,13 +207,14 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
     );
   }
 
-  Widget _buildModuleInfo(Color color) {
+  Widget _buildModuleInfo(BuildContext context, Color color) {
+    final colors = context.colors;
     final progress = widget.module.overallProgress;
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: colors.cardBg,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -227,8 +229,8 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
         children: [
           Text(
             widget.module.description,
-            style: const TextStyle(
-              color: AppColors.textSecondary,
+            style: TextStyle(
+              color: colors.textSecondary,
               fontSize: 13,
               height: 1.6,
             ),
@@ -251,10 +253,10 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Overall Progress',
                 style: TextStyle(
-                  color: AppColors.textPrimary,
+                  color: colors.textPrimary,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
@@ -274,7 +276,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: AppColors.surface,
+              backgroundColor: context.colors.surface,
               valueColor: AlwaysStoppedAnimation<Color>(color),
               minHeight: 10,
             ),
@@ -285,6 +287,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
   }
 
   Widget _infoChip(String value, String label, Color color) {
+    final colors = context.colors;
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -305,8 +308,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
             const SizedBox(height: 2),
             Text(
               label,
-              style: const TextStyle(
-                  color: AppColors.textSecondary, fontSize: 10),
+              style: TextStyle(color: colors.textSecondary, fontSize: 10),
             ),
           ],
         ),
@@ -320,6 +322,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
     Color moduleColor,
     int index,
   ) {
+    final colors = context.colors;
     return GestureDetector(
       onTap: () async {
         await Navigator.push(
@@ -335,7 +338,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.cardBg,
+          color: colors.cardBg,
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
@@ -376,8 +379,8 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                       Expanded(
                         child: Text(
                           sub.name,
-                          style: const TextStyle(
-                            color: AppColors.textPrimary,
+                          style: TextStyle(
+                            color: colors.textPrimary,
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                           ),
@@ -388,7 +391,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 7, vertical: 2),
                           decoration: BoxDecoration(
-                            color: AppColors.successLight,
+                            color: colors.successLight,
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: const Text(
@@ -405,8 +408,8 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                   const SizedBox(height: 4),
                   Text(
                     '${sub.totalLessons} lessons',
-                    style: const TextStyle(
-                        color: AppColors.textSecondary, fontSize: 11),
+                    style: TextStyle(
+                        color: colors.textSecondary, fontSize: 11),
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -416,7 +419,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                           borderRadius: BorderRadius.circular(4),
                           child: LinearProgressIndicator(
                             value: sub.progress,
-                            backgroundColor: AppColors.surface,
+                            backgroundColor: colors.surface,
                             valueColor: AlwaysStoppedAnimation<Color>(
                                 moduleColor),
                             minHeight: 5,
@@ -454,13 +457,14 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
     );
   }
 
-  Widget _buildQuizButton(Color color, bool allCompleted) {
+  Widget _buildQuizButton(BuildContext context, Color color, bool allCompleted) {
+    final colors = context.colors;
     if (_quizPassed) {
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.successLight,
+          color: colors.successLight,
           borderRadius: BorderRadius.circular(18),
           border:
               Border.all(color: AppColors.success.withValues(alpha: 0.4)),
@@ -517,8 +521,8 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
           foregroundColor: Colors.white,
-          disabledBackgroundColor: AppColors.surface,
-          disabledForegroundColor: AppColors.textHint,
+          disabledBackgroundColor: colors.surface,
+          disabledForegroundColor: colors.textHint,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16)),
