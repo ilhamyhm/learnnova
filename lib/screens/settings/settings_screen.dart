@@ -1,5 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
+import '../../services/firebase_auth_service.dart';
+import '../auth/forgot_password_screen.dart';
+import '../auth/login_screen.dart';
 import 'profile_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -13,6 +17,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
   bool _darkModeEnabled = false;
   String _selectedLanguage = 'English';
+
+  User? get _user => FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -105,25 +111,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             const SizedBox(width: 14),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Ahmad Ilham',
-                    style: TextStyle(
+                    _user?.displayName ?? 'LearnNova User',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Text(
-                    'ahmad.ilham@email.com',
-                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                    _user?.email ?? '',
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
-                  SizedBox(height: 6),
-                  Row(
+                  const SizedBox(height: 6),
+                  const Row(
                     children: [
                       Icon(Icons.workspace_premium_rounded, color: Colors.amber, size: 14),
                       SizedBox(width: 4),
@@ -223,13 +229,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
       iconColor: AppColors.moduleCodeLab,
       title: 'Change Password',
       subtitle: 'Update your password',
-      onTap: () => _showComingSoon(context),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
+      ),
     ),
     _settingsTile(
       icon: Icons.email_rounded,
       iconColor: AppColors.moduleCreative,
       title: 'Email Address',
-      subtitle: 'ahmad.ilham@email.com',
+      subtitle: _user?.email ?? '—',
       onTap: () => _showComingSoon(context),
     ),
   ];
@@ -505,7 +514,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () async {
+              Navigator.pop(context);
+              await FirebaseAuthService().signOut();
+              if (!context.mounted) return;
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+                (route) => false,
+              );
+            },
             child: const Text('Log Out', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w700)),
           ),
         ],

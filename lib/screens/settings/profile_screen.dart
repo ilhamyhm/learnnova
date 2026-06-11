@@ -1,9 +1,47 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../data/modules_data.dart';
+import '../../services/firebase_auth_service.dart';
+import '../auth/login_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+
+  /// Returns the current Firebase user, or null.
+  User? get _user => FirebaseAuth.instance.currentUser;
+
+  Future<void> _logout(BuildContext context) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Log Out?'),
+        content: const Text(
+          'Are you sure you want to log out of LearnNova?',
+          style: TextStyle(color: AppColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Log Out', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+    if (confirm == true) {
+      await FirebaseAuthService().signOut();
+      if (!context.mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        (route) => false,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,18 +171,18 @@ class ProfileScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 10),
-                      const Text(
-                        'Ahmad Ilham',
-                        style: TextStyle(
+                      Text(
+                        _user?.displayName ?? 'LearnNova User',
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
                         ),
                       ),
                       const SizedBox(height: 2),
-                      const Text(
-                        'ahmad.ilham@email.com',
-                        style: TextStyle(color: Colors.white70, fontSize: 12),
+                      Text(
+                        _user?.email ?? '',
+                        style: const TextStyle(color: Colors.white70, fontSize: 12),
                       ),
                     ],
                   ),
@@ -288,9 +326,9 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          _infoRow(Icons.person_rounded, 'Full Name', 'Ahmad Ilham'),
+          _infoRow(Icons.person_rounded, 'Full Name', _user?.displayName ?? 'LearnNova User'),
           const Divider(height: 20, color: AppColors.divider),
-          _infoRow(Icons.email_rounded, 'Email', 'ahmad.ilham@email.com'),
+          _infoRow(Icons.email_rounded, 'Email', _user?.email ?? '—'),
           const Divider(height: 20, color: AppColors.divider),
           _infoRow(Icons.phone_rounded, 'Phone', '+62 812 3456 7890'),
           const Divider(height: 20, color: AppColors.divider),
@@ -483,7 +521,7 @@ class ProfileScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           OutlinedButton.icon(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => _logout(context),
             icon: const Icon(Icons.logout_rounded, size: 18, color: AppColors.error),
             label: const Text(
               'Log Out',

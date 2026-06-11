@@ -1,13 +1,22 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'constants/app_colors.dart';
-import 'screens/home/home_screen.dart';
+import 'firebase_options.dart';
+import 'screens/auth/auth_wrapper.dart';
 import 'screens/explorer/explorer_screen.dart';
+import 'screens/home/home_screen.dart';
 import 'screens/progress/progress_screen.dart';
 import 'screens/settings/settings_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ── Firebase initialization ────────────────────────────────────────────────
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -32,7 +41,7 @@ class LearnNovaApp extends StatelessWidget {
       title: 'LearnNova',
       debugShowCheckedModeBanner: false,
       theme: _buildTheme(),
-      home: const MainScaffold(),
+      home: const AuthWrapper(),
     );
   }
 
