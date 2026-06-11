@@ -1,0 +1,490 @@
+import 'package:flutter/material.dart';
+import '../../constants/app_colors.dart';
+import '../../models/module_model.dart';
+import '../../services/api_service.dart';
+import '../material/material_screen.dart';
+
+/// Shows details about a specific submodule (topic) and lets the user
+/// open the MaterialScreen to read learning slides.
+class SubDetailPage extends StatefulWidget {
+  final SubModule subModule;
+  final Color moduleColor;
+
+  const SubDetailPage({
+    super.key,
+    required this.subModule,
+    required this.moduleColor,
+  });
+
+  @override
+  State<SubDetailPage> createState() => _SubDetailPageState();
+}
+
+class _SubDetailPageState extends State<SubDetailPage> {
+  final ApiService _api = ApiService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProgress();
+  }
+
+  Future<void> _loadProgress() async {
+    final progress = await _api.getMaterialProgress(widget.subModule.apiKey);
+    final viewed = await _api.getViewedSlides(widget.subModule.apiKey);
+    if (mounted) {
+      setState(() {
+        widget.subModule.progress = progress;
+        widget.subModule.isCompleted = viewed.length >= widget.subModule.totalLessons;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = widget.moduleColor;
+    final sub = widget.subModule;
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          _buildAppBar(context, color, sub),
+          SliverToBoxAdapter(child: _buildHeroSection(color, sub)),
+          SliverToBoxAdapter(child: _buildProgressSection(color, sub)),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Learning Path',
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  Text(
+                    '${sub.completedLessons}/${sub.totalLessons} done',
+                    style: TextStyle(
+                      color: color,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 120),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (ctx, i) => _buildLessonItem(i, color, sub),
+                childCount: sub.totalLessons,
+              ),
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: _buildBottomBar(context, color, sub),
+    );
+  }
+
+  Widget _buildAppBar(BuildContext context, Color color, SubModule sub) {
+    return SliverAppBar(
+      pinned: true,
+      backgroundColor: color,
+      leading: GestureDetector(
+        onTap: () => Navigator.pop(context),
+        child: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+        ),
+      ),
+      actions: [
+        Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.bookmark_border_rounded,
+                color: Colors.white, size: 20),
+            onPressed: () {},
+            padding: EdgeInsets.zero,
+          ),
+        ),
+      ],
+      title: Text(
+        sub.name,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeroSection(Color color, SubModule sub) {
+    return Container(
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [color, color.withValues(alpha: 0.75)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.4),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            right: -20,
+            top: -20,
+            child: Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(sub.icon, style: const TextStyle(fontSize: 40)),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          sub.name,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(Icons.menu_book_rounded,
+                                color: Colors.white70, size: 13),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${sub.totalLessons} lessons',
+                              style: const TextStyle(
+                                  color: Colors.white70, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                sub.description,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  height: 1.6,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  _heroChip('⭐ 4.9'),
+                  const SizedBox(width: 8),
+                  _heroChip('🏆 Certificate'),
+                  const SizedBox(width: 8),
+                  _heroChip('🔰 Beginner'),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _heroChip(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+            color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
+      ),
+    );
+  }
+
+  Widget _buildProgressSection(Color color, SubModule sub) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.cardBg,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Your Progress',
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Text(
+                sub.progress == 0.0
+                    ? 'Not Started'
+                    : '${(sub.progress * 100).toInt()}%',
+                style: TextStyle(
+                  color: sub.progress == 0.0 ? AppColors.textHint : color,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: sub.progress,
+              backgroundColor: AppColors.surface,
+              valueColor: AlwaysStoppedAnimation<Color>(color),
+              minHeight: 10,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${sub.completedLessons} of ${sub.totalLessons} lessons completed',
+                style: const TextStyle(
+                    color: AppColors.textSecondary, fontSize: 12),
+              ),
+              if (sub.isCompleted)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: AppColors.successLight,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    '🏆 Completed!',
+                    style: TextStyle(
+                        color: AppColors.success,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLessonItem(int index, Color color, SubModule sub) {
+    final isDone = index < sub.completedLessons;
+    final lessonNum = index + 1;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: isDone ? color.withValues(alpha: 0.06) : AppColors.cardBg,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDone ? color.withValues(alpha: 0.3) : AppColors.divider,
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: isDone ? color : AppColors.surface,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Center(
+              child: isDone
+                  ? const Icon(Icons.check_rounded,
+                      color: Colors.white, size: 18)
+                  : Text(
+                      '$lessonNum',
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Lesson $lessonNum',
+                  style: TextStyle(
+                    color: isDone
+                        ? AppColors.textSecondary
+                        : AppColors.textPrimary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    decoration:
+                        isDone ? TextDecoration.lineThrough : null,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  isDone ? 'Completed ✓' : '~15 min',
+                  style: TextStyle(
+                    color:
+                        isDone ? AppColors.success : AppColors.textHint,
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Icon(
+            isDone
+                ? Icons.replay_rounded
+                : Icons.play_circle_filled_rounded,
+            color: isDone ? AppColors.textHint : color,
+            size: 26,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomBar(
+      BuildContext context, Color color, SubModule sub) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 30),
+      decoration: BoxDecoration(
+        color: AppColors.cardBg,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => MaterialScreen(
+                      subModule: sub,
+                      moduleColor: color,
+                    ),
+                  ),
+                );
+                _loadProgress();
+              },
+              icon: Icon(
+                sub.isCompleted
+                    ? Icons.replay_rounded
+                    : Icons.play_arrow_rounded,
+                size: 22,
+              ),
+              label: Text(
+                sub.isCompleted ? 'Review Materials' : 'Start Learning',
+                style: const TextStyle(
+                    fontSize: 15, fontWeight: FontWeight.w700),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: color,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+                elevation: 0,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Container(
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: IconButton(
+              icon: Icon(Icons.share_rounded, color: color),
+              onPressed: () {},
+              padding: const EdgeInsets.all(14),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
