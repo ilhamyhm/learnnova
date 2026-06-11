@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
-import '../../data/modules_data.dart';
 import '../../models/module_model.dart';
+import '../../services/module_state_service.dart';
 import '../home/category_detail_page.dart';
 
 class ExplorerScreen extends StatefulWidget {
@@ -21,7 +21,8 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
   ];
 
   List<Module> get _filteredModules {
-    return allModules.where((m) {
+    final modules = ModuleStateService.instance.modules;
+    return modules.where((m) {
       final matchesSearch = _searchQuery.isEmpty ||
           m.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           m.subModules.any(
@@ -33,7 +34,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
   }
 
   List<SubModule> get _trendingSubModules {
-    return allModules
+    return ModuleStateService.instance.modules
         .expand((m) => m.subModules)
         .take(5)
         .toList();
@@ -172,7 +173,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
   }
 
   Widget _buildFeaturedCourses() {
-    final featured = allModules.take(3).toList();
+    final featured = ModuleStateService.instance.modules.take(3).toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

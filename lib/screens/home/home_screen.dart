@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
-import '../../data/modules_data.dart';
 import '../../models/module_model.dart';
-import '../../services/api_service.dart';
+import '../../services/module_state_service.dart';
 import '../../widgets/category_item.dart';
 import '../home/category_detail_page.dart';
 import '../settings/profile_screen.dart';
@@ -15,14 +14,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final ApiService _api = ApiService();
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  bool _progressLoaded = false;
+
+  List<Module> get _modules => ModuleStateService.instance.modules;
 
   List<Module> get _filteredModules {
-    if (_searchQuery.isEmpty) return allModules;
-    return allModules
+    if (_searchQuery.isEmpty) return _modules;
+    return _modules
         .where(
           (m) =>
               m.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
@@ -31,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .toList();
   }
 
-  List<Module> get _continueModules => allModules
+  List<Module> get _continueModules => _modules
       .where((m) => m.overallProgress > 0 && m.overallProgress < 1)
       .take(4)
       .toList();
@@ -43,19 +42,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadProgress() async {
-    for (final module in allModules) {
-      for (final sub in module.subModules) {
-        final progress = await _api.getMaterialProgress(sub.apiKey);
-        final quizPassed = await _api.isQuizPassed(module.apiKey);
-        sub.progress = progress;
-        sub.isCompleted = progress >= 1.0;
-        if (quizPassed) {
-          sub.progress = 1.0;
-          sub.isCompleted = true;
-        }
-      }
-    }
-    if (mounted) setState(() => _progressLoaded = true);
+    await ModuleStateService.instance.refreshAll();
+    if (mounted) setState(() {});
   }
 
   @override
@@ -100,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Text(
-                      '${allModules.length} courses',
+                      '${_modules.length} courses',
                       style: TextStyle(
                         color: colors.textSecondary,
                         fontSize: 13,
@@ -313,18 +301,18 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildStatsRow() {
-    final totalCompleted = allModules
+    final totalCompleted = _modules
         .expand((m) => m.subModules)
         .where((s) => s.isCompleted)
         .length;
     final totalModules =
-        allModules.expand((m) => m.subModules).length;
-    final overallProgress = allModules.isEmpty
+        _modules.expand((m) => m.subModules).length;
+    final overallProgress = _modules.isEmpty
         ? 0.0
-        : allModules
+        : _modules
                 .map((m) => m.overallProgress)
                 .reduce((a, b) => a + b) /
-            allModules.length;
+            _modules.length;
 
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),

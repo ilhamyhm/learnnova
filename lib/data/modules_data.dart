@@ -1,8 +1,15 @@
 import '../models/module_model.dart';
 import '../constants/app_colors.dart';
 
-/// All learning modules. Every submodule starts at 0% progress (Not Started).
-final List<Module> allModules = [
+/// Returns a **fresh, independent** list of all learning modules.
+///
+/// Every call creates new [Module] and [SubModule] instances so that
+/// progress mutations (`.progress`, `.isCompleted`) for one user never
+/// bleed into another user's copy.
+///
+/// Use [ModuleStateService.instance.modules] throughout the app instead
+/// of calling this directly — it caches the list for the current session.
+List<Module> buildModules() => [
   // 1. CodeLab
   Module(
     name: 'CodeLab',

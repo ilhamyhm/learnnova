@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../models/module_model.dart';
-import '../../services/api_service.dart';
+import '../../services/user_progress_service.dart';
 import '../quiz/quiz_screen.dart';
 import 'sub_detail_page.dart';
 
@@ -18,7 +18,7 @@ class CategoryDetailPage extends StatefulWidget {
 }
 
 class _CategoryDetailPageState extends State<CategoryDetailPage> {
-  final ApiService _api = ApiService();
+  final _progress = UserProgressService.instance;
   bool _quizPassed = false;
 
   @override
@@ -29,11 +29,11 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
 
   Future<void> _loadProgress() async {
     for (final sub in widget.module.subModules) {
-      final progress = await _api.getMaterialProgress(sub.apiKey);
+      final progress = await _progress.getMaterialProgress(sub.apiKey);
       sub.progress = progress;
       sub.isCompleted = progress >= 1.0;
     }
-    final passed = await _api.isQuizPassed(widget.module.apiKey);
+    final passed = await _progress.isQuizPassed(widget.module.apiKey);
     if (mounted) {
       setState(() => _quizPassed = passed);
     }
