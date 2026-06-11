@@ -42,7 +42,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadProgress();
   }
 
-  /// Loads persisted progress for every submodule from SharedPreferences.
   Future<void> _loadProgress() async {
     for (final module in allModules) {
       for (final sub in module.subModules) {
@@ -67,8 +66,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       body: RefreshIndicator(
         onRefresh: _loadProgress,
         color: AppColors.primary,
@@ -79,30 +79,30 @@ class _HomeScreenState extends State<HomeScreen> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: _buildSearchBar(),
+                child: _buildSearchBar(context),
               ),
             ),
             SliverToBoxAdapter(child: _buildStatsRow()),
             if (_continueModules.isNotEmpty)
-              SliverToBoxAdapter(child: _buildContinueLearning()),
+              SliverToBoxAdapter(child: _buildContinueLearning(context)),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'All Modules',
                       style: TextStyle(
-                        color: AppColors.textPrimary,
+                        color: colors.textPrimary,
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
                     Text(
                       '${allModules.length} courses',
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
+                      style: TextStyle(
+                        color: colors.textSecondary,
                         fontSize: 13,
                       ),
                     ),
@@ -270,11 +270,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(BuildContext context) {
+    final colors = context.colors;
     return Container(
       margin: const EdgeInsets.only(top: 16, bottom: 8),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: colors.cardBg,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -287,10 +288,10 @@ class _HomeScreenState extends State<HomeScreen> {
       child: TextField(
         controller: _searchController,
         onChanged: (v) => setState(() => _searchQuery = v),
-        style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+        style: TextStyle(color: colors.textPrimary, fontSize: 14),
         decoration: InputDecoration(
           hintText: 'Search modules, courses...',
-          hintStyle: const TextStyle(color: AppColors.textHint, fontSize: 14),
+          hintStyle: TextStyle(color: colors.textHint, fontSize: 14),
           prefixIcon: const Icon(Icons.search_rounded,
               color: AppColors.primary, size: 22),
           suffixIcon: _searchQuery.isNotEmpty
@@ -299,8 +300,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     _searchController.clear();
                     setState(() => _searchQuery = '');
                   },
-                  child: const Icon(Icons.close_rounded,
-                      color: AppColors.textSecondary, size: 20),
+                  child: Icon(Icons.close_rounded,
+                      color: colors.textSecondary, size: 20),
                 )
               : null,
           border: InputBorder.none,
@@ -391,16 +392,17 @@ class _HomeScreenState extends State<HomeScreen> {
         color: Colors.white.withValues(alpha: 0.2),
       );
 
-  Widget _buildContinueLearning() {
+  Widget _buildContinueLearning(BuildContext context) {
+    final colors = context.colors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(20, 24, 20, 14),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 14),
           child: Text(
             'Continue Learning 🔥',
             style: TextStyle(
-              color: AppColors.textPrimary,
+              color: colors.textPrimary,
               fontSize: 20,
               fontWeight: FontWeight.w800,
             ),
@@ -423,7 +425,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColors.cardBg,
+                    color: colors.cardBg,
                     borderRadius: BorderRadius.circular(18),
                     boxShadow: [
                       BoxShadow(
@@ -462,8 +464,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 Text(
                                   module.name,
-                                  style: const TextStyle(
-                                    color: AppColors.textPrimary,
+                                  style: TextStyle(
+                                    color: colors.textPrimary,
                                     fontSize: 13,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -472,8 +474,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 Text(
                                   module.category,
-                                  style: const TextStyle(
-                                    color: AppColors.textSecondary,
+                                  style: TextStyle(
+                                    color: colors.textSecondary,
                                     fontSize: 10,
                                   ),
                                 ),
@@ -496,8 +498,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           Text(
                             '${module.completedSubModules}/${module.subModules.length}',
-                            style: const TextStyle(
-                              color: AppColors.textSecondary,
+                            style: TextStyle(
+                              color: colors.textSecondary,
                               fontSize: 10,
                             ),
                           ),
@@ -508,7 +510,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(4),
                         child: LinearProgressIndicator(
                           value: module.overallProgress,
-                          backgroundColor: AppColors.surface,
+                          backgroundColor: colors.surface,
                           valueColor: AlwaysStoppedAnimation<Color>(color),
                           minHeight: 5,
                         ),
@@ -530,7 +532,6 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(
           builder: (_) => CategoryDetailPage(module: module)),
     );
-    // Reload progress when returning from module
     _loadProgress();
   }
 }
