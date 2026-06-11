@@ -42,27 +42,28 @@ class _SubDetailPageState extends State<SubDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final color = widget.moduleColor;
     final sub = widget.subModule;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
           _buildAppBar(context, color, sub),
           SliverToBoxAdapter(child: _buildHeroSection(color, sub)),
-          SliverToBoxAdapter(child: _buildProgressSection(color, sub)),
+          SliverToBoxAdapter(child: _buildProgressSection(context, color, sub)),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Learning Path',
                     style: TextStyle(
-                      color: AppColors.textPrimary,
+                      color: colors.textPrimary,
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
                     ),
@@ -83,7 +84,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 120),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
-                (ctx, i) => _buildLessonItem(i, color, sub),
+                (ctx, i) => _buildLessonItem(context, i, color, sub),
                 childCount: sub.totalLessons,
               ),
             ),
@@ -247,12 +248,13 @@ class _SubDetailPageState extends State<SubDetailPage> {
     );
   }
 
-  Widget _buildProgressSection(Color color, SubModule sub) {
+  Widget _buildProgressSection(BuildContext context, Color color, SubModule sub) {
+    final colors = context.colors;
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: colors.cardBg,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -268,10 +270,10 @@ class _SubDetailPageState extends State<SubDetailPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Your Progress',
                 style: TextStyle(
-                  color: AppColors.textPrimary,
+                  color: colors.textPrimary,
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                 ),
@@ -281,7 +283,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
                     ? 'Not Started'
                     : '${(sub.progress * 100).toInt()}%',
                 style: TextStyle(
-                  color: sub.progress == 0.0 ? AppColors.textHint : color,
+                  color: sub.progress == 0.0 ? colors.textHint : color,
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
                 ),
@@ -293,7 +295,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
               value: sub.progress,
-              backgroundColor: AppColors.surface,
+              backgroundColor: colors.surface,
               valueColor: AlwaysStoppedAnimation<Color>(color),
               minHeight: 10,
             ),
@@ -304,15 +306,14 @@ class _SubDetailPageState extends State<SubDetailPage> {
             children: [
               Text(
                 '${sub.completedLessons} of ${sub.totalLessons} lessons completed',
-                style: const TextStyle(
-                    color: AppColors.textSecondary, fontSize: 12),
+                style: TextStyle(color: colors.textSecondary, fontSize: 12),
               ),
               if (sub.isCompleted)
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppColors.successLight,
+                    color: colors.successLight,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Text(
@@ -330,7 +331,8 @@ class _SubDetailPageState extends State<SubDetailPage> {
     );
   }
 
-  Widget _buildLessonItem(int index, Color color, SubModule sub) {
+  Widget _buildLessonItem(BuildContext context, int index, Color color, SubModule sub) {
+    final colors = context.colors;
     final isDone = index < sub.completedLessons;
     final lessonNum = index + 1;
 
@@ -338,10 +340,10 @@ class _SubDetailPageState extends State<SubDetailPage> {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDone ? color.withValues(alpha: 0.06) : AppColors.cardBg,
+        color: isDone ? color.withValues(alpha: 0.06) : colors.cardBg,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDone ? color.withValues(alpha: 0.3) : AppColors.divider,
+          color: isDone ? color.withValues(alpha: 0.3) : colors.divider,
           width: 1.5,
         ),
         boxShadow: [
@@ -358,7 +360,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: isDone ? color : AppColors.surface,
+              color: isDone ? color : colors.surface,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Center(
@@ -384,8 +386,8 @@ class _SubDetailPageState extends State<SubDetailPage> {
                   'Lesson $lessonNum',
                   style: TextStyle(
                     color: isDone
-                        ? AppColors.textSecondary
-                        : AppColors.textPrimary,
+                        ? colors.textSecondary
+                        : colors.textPrimary,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     decoration:
@@ -397,7 +399,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
                   isDone ? 'Completed ✓' : '~15 min',
                   style: TextStyle(
                     color:
-                        isDone ? AppColors.success : AppColors.textHint,
+                        isDone ? AppColors.success : colors.textHint,
                     fontSize: 11,
                   ),
                 ),
@@ -408,7 +410,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
             isDone
                 ? Icons.replay_rounded
                 : Icons.play_circle_filled_rounded,
-            color: isDone ? AppColors.textHint : color,
+            color: isDone ? colors.textHint : color,
             size: 26,
           ),
         ],
@@ -418,10 +420,11 @@ class _SubDetailPageState extends State<SubDetailPage> {
 
   Widget _buildBottomBar(
       BuildContext context, Color color, SubModule sub) {
+    final colors = context.colors;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 30),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: colors.cardBg,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),

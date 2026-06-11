@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
-import '../models/module_model.dart';
+import '../../constants/app_colors.dart';
+import '../../models/module_model.dart';
 
 /// A compact, list-style card for displaying a learning module.
 /// Shows icon, name, category badge, topic count, progress bar, and an
@@ -17,6 +17,7 @@ class CategoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final color = Color(module.colorValue);
     final progress = module.overallProgress;
     final isCompleted = module.allSubModulesCompleted && progress >= 1.0;
@@ -32,7 +33,7 @@ class CategoryItem extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: AppColors.cardBg,
+          color: colors.cardBg,
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
@@ -81,8 +82,8 @@ class CategoryItem extends StatelessWidget {
                       Expanded(
                         child: Text(
                           module.name,
-                          style: const TextStyle(
-                            color: AppColors.textPrimary,
+                          style: TextStyle(
+                            color: colors.textPrimary,
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                           ),
@@ -117,8 +118,8 @@ class CategoryItem extends StatelessWidget {
                     children: [
                       Text(
                         '${module.subModules.length} topics',
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
+                        style: TextStyle(
+                          color: colors.textSecondary,
                           fontSize: 11,
                         ),
                       ),
@@ -126,7 +127,7 @@ class CategoryItem extends StatelessWidget {
                         progressLabel,
                         style: TextStyle(
                           color: progress == 0.0
-                              ? AppColors.textHint
+                              ? colors.textHint
                               : isCompleted
                                   ? AppColors.success
                                   : color,
@@ -143,7 +144,7 @@ class CategoryItem extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: progress,
-                      backgroundColor: AppColors.surface,
+                      backgroundColor: colors.surface,
                       valueColor: AlwaysStoppedAnimation<Color>(
                         isCompleted ? AppColors.success : color,
                       ),

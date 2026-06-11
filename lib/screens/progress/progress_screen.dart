@@ -65,17 +65,18 @@ class _ProgressScreenState extends State<ProgressScreen>
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
           _buildHeader(),
-          SliverToBoxAdapter(child: _buildOverallProgress()),
-          SliverToBoxAdapter(child: _buildStatsRow()),
-          SliverToBoxAdapter(child: _buildWeeklyActivity()),
-          SliverToBoxAdapter(child: _buildBadges()),
-          SliverToBoxAdapter(child: _buildCompletedModules()),
+          SliverToBoxAdapter(child: _buildOverallProgress(context)),
+          SliverToBoxAdapter(child: _buildStatsRow(context)),
+          SliverToBoxAdapter(child: _buildWeeklyActivity(context)),
+          SliverToBoxAdapter(child: _buildBadges(context)),
+          SliverToBoxAdapter(child: _buildCompletedModules(context)),
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
@@ -132,12 +133,13 @@ class _ProgressScreenState extends State<ProgressScreen>
     );
   }
 
-  Widget _buildOverallProgress() {
+  Widget _buildOverallProgress(BuildContext context) {
+    final colors = context.colors;
     return Container(
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: colors.cardBg,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -149,10 +151,10 @@ class _ProgressScreenState extends State<ProgressScreen>
       ),
       child: Column(
         children: [
-          const Text(
+          Text(
             'Overall Completion',
             style: TextStyle(
-              color: AppColors.textPrimary,
+              color: colors.textPrimary,
               fontSize: 16,
               fontWeight: FontWeight.w700,
             ),
@@ -169,23 +171,23 @@ class _ProgressScreenState extends State<ProgressScreen>
                   children: [
                     CustomPaint(
                       size: const Size(180, 180),
-                      painter: _DonutPainter(_progressAnim.value),
+                      painter: _DonutPainter(_progressAnim.value, context.colors.surface),
                     ),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           '${(_progressAnim.value * 100).toInt()}%',
-                          style: const TextStyle(
-                            color: AppColors.textPrimary,
+                          style: TextStyle(
+                            color: colors.textPrimary,
                             fontSize: 36,
                             fontWeight: FontWeight.w900,
                           ),
                         ),
-                        const Text(
+                        Text(
                           'Completed',
                           style: TextStyle(
-                            color: AppColors.textSecondary,
+                            color: colors.textSecondary,
                             fontSize: 12,
                           ),
                         ),
@@ -202,11 +204,11 @@ class _ProgressScreenState extends State<ProgressScreen>
             children: [
               _legendDot(AppColors.primary),
               const SizedBox(width: 6),
-              const Text('Completed', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+              Text('Completed', style: TextStyle(color: colors.textSecondary, fontSize: 12)),
               const SizedBox(width: 16),
-              _legendDot(AppColors.surface),
+              _legendDot(colors.surface),
               const SizedBox(width: 6),
-              const Text('Remaining', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+              Text('Remaining', style: TextStyle(color: colors.textSecondary, fontSize: 12)),
             ],
           ),
         ],
@@ -222,26 +224,27 @@ class _ProgressScreenState extends State<ProgressScreen>
     );
   }
 
-  Widget _buildStatsRow() {
+  Widget _buildStatsRow(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          Expanded(child: _statCard('📚', '$_completedModules', 'Completed', AppColors.primary)),
+          Expanded(child: _statCard(context, '📚', '$_completedModules', 'Completed', AppColors.primary)),
           const SizedBox(width: 12),
-          Expanded(child: _statCard('🏆', '3', 'Certificates', AppColors.accent)),
+          Expanded(child: _statCard(context, '🏆', '3', 'Certificates', AppColors.accent)),
           const SizedBox(width: 12),
-          Expanded(child: _statCard('⏱️', '${(_totalLessons * 15 / 60).toStringAsFixed(0)}h', 'Hours', AppColors.moduleCreative)),
+          Expanded(child: _statCard(context, '⏱️', '${(_totalLessons * 15 / 60).toStringAsFixed(0)}h', 'Hours', AppColors.moduleCreative)),
         ],
       ),
     );
   }
 
-  Widget _statCard(String icon, String value, String label, Color color) {
+  Widget _statCard(BuildContext context, String icon, String value, String label, Color color) {
+    final colors = context.colors;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: colors.cardBg,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -265,19 +268,20 @@ class _ProgressScreenState extends State<ProgressScreen>
           ),
           Text(
             label,
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 10),
+            style: TextStyle(color: colors.textSecondary, fontSize: 10),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildWeeklyActivity() {
+  Widget _buildWeeklyActivity(BuildContext context) {
+    final colors = context.colors;
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: colors.cardBg,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -293,10 +297,10 @@ class _ProgressScreenState extends State<ProgressScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Weekly Activity',
                 style: TextStyle(
-                  color: AppColors.textPrimary,
+                  color: colors.textPrimary,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                 ),
@@ -304,7 +308,7 @@ class _ProgressScreenState extends State<ProgressScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.primarySurface,
+                  color: colors.primarySurface,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text(
@@ -351,7 +355,7 @@ class _ProgressScreenState extends State<ProgressScreen>
                     Text(
                       data['day'],
                       style: TextStyle(
-                        color: isToday ? AppColors.accent : AppColors.textSecondary,
+                        color: isToday ? AppColors.accent : colors.textSecondary,
                         fontSize: 10,
                         fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,
                       ),
@@ -366,16 +370,17 @@ class _ProgressScreenState extends State<ProgressScreen>
     );
   }
 
-  Widget _buildBadges() {
+  Widget _buildBadges(BuildContext context) {
+    final colors = context.colors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(20, 20, 20, 12),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
           child: Text(
             '🏆 Achievement Badges',
             style: TextStyle(
-              color: AppColors.textPrimary,
+              color: colors.textPrimary,
               fontSize: 18,
               fontWeight: FontWeight.w800,
             ),
@@ -396,10 +401,10 @@ class _ProgressScreenState extends State<ProgressScreen>
                 margin: const EdgeInsets.symmetric(horizontal: 4),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: earned ? AppColors.cardBg : AppColors.surface,
+                  color: earned ? colors.cardBg : colors.surface,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: earned ? AppColors.accent.withValues(alpha: 0.4) : AppColors.divider,
+                    color: earned ? AppColors.accent.withValues(alpha: 0.4) : colors.divider,
                     width: 1.5,
                   ),
                   boxShadow: earned
@@ -426,7 +431,7 @@ class _ProgressScreenState extends State<ProgressScreen>
                     Text(
                       badge['name'],
                       style: TextStyle(
-                        color: earned ? AppColors.textPrimary : AppColors.textHint,
+                        color: earned ? colors.textPrimary : colors.textHint,
                         fontSize: 9,
                         fontWeight: FontWeight.w600,
                       ),
@@ -444,7 +449,8 @@ class _ProgressScreenState extends State<ProgressScreen>
     );
   }
 
-  Widget _buildCompletedModules() {
+  Widget _buildCompletedModules(BuildContext context) {
+    final colors = context.colors;
     final completed = allModules.expand((m) => m.subModules).where((s) => s.isCompleted).toList();
     if (completed.isEmpty) return const SizedBox.shrink();
 
@@ -456,17 +462,17 @@ class _ProgressScreenState extends State<ProgressScreen>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 '✅ Completed Modules',
                 style: TextStyle(
-                  color: AppColors.textPrimary,
+                  color: colors.textPrimary,
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
                 ),
               ),
               Text(
                 '${completed.length} done',
-                style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                style: TextStyle(color: colors.textSecondary, fontSize: 12),
               ),
             ],
           ),
@@ -475,7 +481,7 @@ class _ProgressScreenState extends State<ProgressScreen>
           margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: AppColors.successLight,
+            color: colors.successLight,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: AppColors.success.withValues(alpha: 0.3), width: 1.5),
           ),
@@ -497,15 +503,15 @@ class _ProgressScreenState extends State<ProgressScreen>
                   children: [
                     Text(
                       sub.name,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
+                      style: TextStyle(
+                        color: colors.textPrimary,
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     Text(
                       '${sub.totalLessons} lessons completed',
-                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                      style: TextStyle(color: colors.textSecondary, fontSize: 11),
                     ),
                   ],
                 ),
@@ -531,7 +537,8 @@ class _ProgressScreenState extends State<ProgressScreen>
 
 class _DonutPainter extends CustomPainter {
   final double progress;
-  _DonutPainter(this.progress);
+  final Color trackColor;
+  _DonutPainter(this.progress, this.trackColor);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -543,7 +550,7 @@ class _DonutPainter extends CustomPainter {
     final bgPaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
-      ..color = AppColors.surface
+      ..color = trackColor
       ..strokeCap = StrokeCap.round;
 
     canvas.drawCircle(center, radius, bgPaint);
@@ -569,5 +576,5 @@ class _DonutPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_DonutPainter old) => old.progress != progress;
+  bool shouldRepaint(_DonutPainter old) => old.progress != progress || old.trackColor != trackColor;
 }

@@ -105,16 +105,17 @@ class _MaterialScreenState extends State<MaterialScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final color = widget.moduleColor;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       appBar: _buildAppBar(color),
       body: _isLoading
           ? _buildLoading(color)
           : _error != null
-              ? _buildError()
-              : _buildContent(color),
+              ? _buildError(context)
+              : _buildContent(context, color),
     );
   }
 
@@ -174,29 +175,28 @@ class _MaterialScreenState extends State<MaterialScreen> {
             valueColor: AlwaysStoppedAnimation<Color>(color),
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Loading materials...',
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+            style: TextStyle(color: context.colors.textSecondary, fontSize: 14),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildError() {
+  Widget _buildError(BuildContext context) {
+    final colors = context.colors;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.wifi_off_rounded,
-                size: 64, color: AppColors.textHint),
+            Icon(Icons.wifi_off_rounded, size: 64, color: colors.textHint),
             const SizedBox(height: 16),
             Text(
               _error!,
-              style: const TextStyle(
-                  color: AppColors.textSecondary, fontSize: 14),
+              style: TextStyle(color: colors.textSecondary, fontSize: 14),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
@@ -217,7 +217,8 @@ class _MaterialScreenState extends State<MaterialScreen> {
     );
   }
 
-  Widget _buildContent(Color color) {
+  Widget _buildContent(BuildContext context, Color color) {
+    final colors = context.colors;
     final materials = _data!.materials;
     final slide = materials[_currentIndex];
     final isViewed = _viewedIds.contains(slide.materialId);
@@ -331,8 +332,8 @@ class _MaterialScreenState extends State<MaterialScreen> {
                     Expanded(
                       child: Text(
                         slide.title,
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
+                        style: TextStyle(
+                          color: colors.textPrimary,
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
                           height: 1.3,
@@ -344,7 +345,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: AppColors.successLight,
+                          color: colors.successLight,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Row(
@@ -372,7 +373,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: AppColors.cardBg,
+                    color: colors.cardBg,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
@@ -384,8 +385,8 @@ class _MaterialScreenState extends State<MaterialScreen> {
                   ),
                   child: Text(
                     slide.content,
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
+                    style: TextStyle(
+                      color: colors.textPrimary,
                       fontSize: 14,
                       height: 1.7,
                     ),
@@ -405,7 +406,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
         ),
 
         // ── Navigation Buttons ───────────────────────────────────────────
-        _buildNavBar(color, materials.length),
+        _buildNavBar(context, color, materials.length),
       ],
     );
   }
@@ -420,9 +421,9 @@ class _MaterialScreenState extends State<MaterialScreen> {
             Container(
               padding:
                   const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E1E2E),
-                borderRadius: const BorderRadius.only(
+              decoration: const BoxDecoration(
+                color: Color(0xFF1E1E2E),
+                borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(10),
                   topRight: Radius.circular(10),
                 ),
@@ -509,7 +510,8 @@ class _MaterialScreenState extends State<MaterialScreen> {
     );
   }
 
-  Widget _buildNavBar(Color color, int total) {
+  Widget _buildNavBar(BuildContext context, Color color, int total) {
+    final colors = context.colors;
     final isFirst = _currentIndex == 0;
     final isLast = _currentIndex == total - 1;
     final allViewed = _data != null &&
@@ -518,7 +520,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: colors.cardBg,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
@@ -553,7 +555,6 @@ class _MaterialScreenState extends State<MaterialScreen> {
 
           // Next / Finish button
           Expanded(
-            flex: isFirst ? 1 : 1,
             child: ElevatedButton.icon(
               onPressed: isLast
                   ? (allViewed
@@ -580,7 +581,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: color,
                 foregroundColor: Colors.white,
-                disabledBackgroundColor: AppColors.surface,
+                disabledBackgroundColor: colors.surface,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14)),
