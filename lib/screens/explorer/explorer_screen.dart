@@ -47,8 +47,9 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -130,11 +131,12 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
   }
 
   Widget _buildSearchBar() {
+    final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.cardBg,
+          color: colors.cardBg,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -147,14 +149,14 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
         child: TextField(
           controller: _searchController,
           onChanged: (v) => setState(() => _searchQuery = v),
-          style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+          style: TextStyle(color: colors.textPrimary, fontSize: 14),
           decoration: InputDecoration(
             hintText: 'Search courses, topics...',
-            hintStyle: const TextStyle(color: AppColors.textHint),
+            hintStyle: TextStyle(color: colors.textHint),
             prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primary),
             suffixIcon: _searchQuery.isNotEmpty
                 ? IconButton(
-                    icon: const Icon(Icons.close_rounded, color: AppColors.textSecondary),
+                    icon: Icon(Icons.close_rounded, color: colors.textSecondary),
                     onPressed: () {
                       _searchController.clear();
                       setState(() => _searchQuery = '');
@@ -287,6 +289,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
   }
 
   Widget _buildCategoryFilter() {
+    final colors = context.colors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -308,7 +311,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                   margin: const EdgeInsets.only(right: 8),
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppColors.primary : AppColors.cardBg,
+                    color: isSelected ? AppColors.primary : colors.cardBg,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
@@ -324,7 +327,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                     child: Text(
                       cat,
                       style: TextStyle(
-                        color: isSelected ? Colors.white : AppColors.textSecondary,
+                        color: isSelected ? Colors.white : colors.textSecondary,
                         fontSize: 12,
                         fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                       ),
@@ -340,6 +343,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
   }
 
   Widget _buildTrending() {
+    final colors = context.colors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -358,7 +362,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                 margin: const EdgeInsets.symmetric(horizontal: 4),
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: AppColors.cardBg,
+                  color: colors.cardBg,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
@@ -378,10 +382,10 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: AppColors.accentLight,
+                            color: colors.accentLight,
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: const Text(
+                          child: Text(
                             '🔥 Hot',
                             style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: AppColors.accentDark),
                           ),
@@ -391,8 +395,8 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                     const Spacer(),
                     Text(
                       sub.name,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
+                      style: TextStyle(
+                        color: colors.textPrimary,
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                       ),
@@ -401,7 +405,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                     ),
                     Text(
                       '${sub.totalLessons} lessons',
-                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 10),
+                      style: TextStyle(color: colors.textSecondary, fontSize: 10),
                     ),
                   ],
                 ),
@@ -414,6 +418,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
   }
 
   Widget _buildModuleListCard(Module module) {
+    final colors = context.colors;
     final color = Color(module.colorValue);
     return GestureDetector(
       onTap: () => Navigator.push(
@@ -424,7 +429,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.cardBg,
+          color: colors.cardBg,
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
@@ -460,8 +465,8 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                     children: [
                       Text(
                         module.name,
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
+                        style: TextStyle(
+                          color: colors.textPrimary,
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                         ),
@@ -469,7 +474,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                       const Spacer(),
                       Text(
                         '⭐ 4.8',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.accent,
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -480,7 +485,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                   const SizedBox(height: 2),
                   Text(
                     '${module.subModules.length} topics • ${module.category}',
-                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                    style: TextStyle(color: colors.textSecondary, fontSize: 11),
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -490,7 +495,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                           borderRadius: BorderRadius.circular(4),
                           child: LinearProgressIndicator(
                             value: module.overallProgress,
-                            backgroundColor: AppColors.surface,
+                            backgroundColor: colors.surface,
                             valueColor: AlwaysStoppedAnimation<Color>(color),
                             minHeight: 4,
                           ),
@@ -527,6 +532,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
   }
 
   Widget _buildSectionTitle(String title, String subtitle) {
+    final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
       child: Row(
@@ -534,8 +540,8 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
         children: [
           Text(
             title,
-            style: const TextStyle(
-              color: AppColors.textPrimary,
+            style: TextStyle(
+              color: colors.textPrimary,
               fontSize: 18,
               fontWeight: FontWeight.w800,
             ),
@@ -543,7 +549,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
           if (subtitle.isNotEmpty)
             Text(
               subtitle,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+              style: TextStyle(color: colors.textSecondary, fontSize: 12),
             ),
         ],
       ),
