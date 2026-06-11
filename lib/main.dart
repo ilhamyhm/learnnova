@@ -40,14 +40,26 @@ class LearnNovaApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: themeNotifier,
-      builder: (context, mode, child) => MaterialApp(
-        title: 'LearnNova',
-        debugShowCheckedModeBanner: false,
-        theme: _buildTheme(),
-        darkTheme: _buildDarkTheme(),
-        themeMode: mode,
-        home: const AuthWrapper(),
-      ),
+      builder: (context, mode, child) {
+        // Update system UI overlay when theme changes
+        final isDark = mode == ThemeMode.dark;
+        SystemChrome.setSystemUIOverlayStyle(
+          SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: isDark ? Brightness.light : Brightness.light,
+            systemNavigationBarColor: isDark ? const Color(0xFF0D0F1A) : AppColors.white,
+            systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          ),
+        );
+        return MaterialApp(
+          title: 'LearnNova',
+          debugShowCheckedModeBanner: false,
+          theme: _buildTheme(),
+          darkTheme: _buildDarkTheme(),
+          themeMode: mode,
+          home: const AuthWrapper(),
+        );
+      },
     );
   }
 
@@ -128,6 +140,13 @@ class LearnNovaApp extends StatelessWidget {
   }
 
   ThemeData _buildDarkTheme() {
+    const bg = Color(0xFF0D0F1A);
+    const card = Color(0xFF161928);
+    const surfaceColor = Color(0xFF1E2235);
+    const textMain = Color(0xFFEEF2FF);
+    const textSub = Color(0xFF9BA3B8);
+    const dividerColor = Color(0xFF252A40);
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
@@ -137,31 +156,102 @@ class LearnNovaApp extends StatelessWidget {
         seedColor: AppColors.primary,
         primary: AppColors.primary,
         secondary: AppColors.accent,
-        surface: const Color(0xFF1A1D2E),
+        surface: card,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
-        onSurface: const Color(0xFFF0F4FF),
+        onSurface: textMain,
       ),
-      scaffoldBackgroundColor: const Color(0xFF0F1117),
+      scaffoldBackgroundColor: bg,
       appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF1A1D2E),
-        foregroundColor: Colors.white,
+        backgroundColor: card,
+        foregroundColor: textMain,
         elevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
-          color: Colors.white,
+          color: textMain,
           fontSize: 20,
           fontWeight: FontWeight.w700,
         ),
       ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.primary,
+          side: const BorderSide(color: AppColors.primary),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+        ),
+      ),
       cardTheme: CardThemeData(
-        color: const Color(0xFF1A1D2E),
+        color: card,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: surfaceColor,
+        labelStyle: const TextStyle(color: textSub),
+        hintStyle: const TextStyle(color: Color(0xFF4B5268)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: dividerColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        ),
+      ),
       snackBarTheme: SnackBarThemeData(
+        backgroundColor: card,
+        contentTextStyle: const TextStyle(color: textMain),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: AppColors.primary,
+        linearTrackColor: surfaceColor,
+      ),
+      dividerTheme: const DividerThemeData(color: dividerColor),
+      dialogTheme: DialogThemeData(
+        backgroundColor: card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.selected)) return AppColors.primary;
+          return const Color(0xFF4B5268);
+        }),
+        trackColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.selected)) return AppColors.primaryLight;
+          return const Color(0xFF252A40);
+        }),
+      ),
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.selected)) return AppColors.primary;
+          return Colors.transparent;
+        }),
+        side: const BorderSide(color: Color(0xFF4B5268), width: 1.5),
+      ),
+      dropdownMenuTheme: DropdownMenuThemeData(
+        textStyle: const TextStyle(color: textMain),
+        menuStyle: MenuStyle(
+          backgroundColor: WidgetStateProperty.all(card),
+        ),
       ),
     );
   }
@@ -224,9 +314,10 @@ class _MainScaffoldState extends State<MainScaffold>
   }
 
   Widget _buildBottomNav(BuildContext context) {
+    final colors = context.colors;
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: colors.cardBg,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
@@ -256,6 +347,7 @@ class _MainScaffoldState extends State<MainScaffold>
   }
 
   Widget _buildNavItem(_NavItem item, int index, bool isActive) {
+    final colors = context.colors;
     return GestureDetector(
       onTap: () => _onTabTapped(index),
       behavior: HitTestBehavior.opaque,
@@ -264,7 +356,7 @@ class _MainScaffoldState extends State<MainScaffold>
         curve: Curves.easeInOut,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isActive ? AppColors.primarySurface : Colors.transparent,
+          color: isActive ? colors.primarySurface : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -275,7 +367,7 @@ class _MainScaffoldState extends State<MainScaffold>
               child: Icon(
                 isActive ? item.activeIcon : item.icon,
                 key: ValueKey(isActive),
-                color: isActive ? AppColors.primary : AppColors.textSecondary,
+                color: isActive ? AppColors.primary : colors.textSecondary,
                 size: 24,
               ),
             ),
