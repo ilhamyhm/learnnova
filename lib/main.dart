@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'constants/app_colors.dart';
+import 'constants/app_theme.dart';
 import 'firebase_options.dart';
 import 'screens/auth/auth_wrapper.dart';
 import 'screens/explorer/explorer_screen.dart';
@@ -37,11 +38,16 @@ class LearnNovaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'LearnNova',
-      debugShowCheckedModeBanner: false,
-      theme: _buildTheme(),
-      home: const AuthWrapper(),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeNotifier,
+      builder: (context, mode, child) => MaterialApp(
+        title: 'LearnNova',
+        debugShowCheckedModeBanner: false,
+        theme: _buildTheme(),
+        darkTheme: _buildDarkTheme(),
+        themeMode: mode,
+        home: const AuthWrapper(),
+      ),
     );
   }
 
@@ -117,6 +123,45 @@ class LearnNovaApp extends StatelessWidget {
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.primary,
         linearTrackColor: AppColors.surface,
+      ),
+    );
+  }
+
+  ThemeData _buildDarkTheme() {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      fontFamily: 'Roboto',
+      colorScheme: ColorScheme.fromSeed(
+        brightness: Brightness.dark,
+        seedColor: AppColors.primary,
+        primary: AppColors.primary,
+        secondary: AppColors.accent,
+        surface: const Color(0xFF1A1D2E),
+        onPrimary: Colors.white,
+        onSecondary: Colors.white,
+        onSurface: const Color(0xFFF0F4FF),
+      ),
+      scaffoldBackgroundColor: const Color(0xFF0F1117),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF1A1D2E),
+        foregroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: false,
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+      cardTheme: CardThemeData(
+        color: const Color(0xFF1A1D2E),
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }

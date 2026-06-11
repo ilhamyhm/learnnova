@@ -1,9 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_theme.dart';
 import '../../services/firebase_auth_service.dart';
 import '../auth/forgot_password_screen.dart';
 import '../auth/login_screen.dart';
+import 'edit_profile_screen.dart';
+import 'help_support_screen.dart';
+import 'notification_settings_screen.dart';
+import 'privacy_settings_screen.dart';
 import 'profile_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -15,7 +20,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
-  bool _darkModeEnabled = false;
+  bool _darkModeEnabled = themeNotifier.value == ThemeMode.dark;
   String _selectedLanguage = 'English';
 
   User? get _user => FirebaseAuth.instance.currentUser;
@@ -30,8 +35,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildHeader(context),
           SliverToBoxAdapter(child: _buildProfileTile(context)),
           SliverToBoxAdapter(child: _buildSection('Account', _accountItems(context))),
-          SliverToBoxAdapter(child: _buildSection('Preferences', _preferenceItems())),
-          SliverToBoxAdapter(child: _buildSection('Support', _supportItems())),
+          SliverToBoxAdapter(child: _buildSection('Preferences', _preferenceItems(context))),
+          SliverToBoxAdapter(child: _buildSection('Support', _supportItems(context))),
           SliverToBoxAdapter(child: _buildSection('About', _aboutItems())),
           SliverToBoxAdapter(child: _buildLogout(context)),
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
@@ -221,7 +226,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       subtitle: 'Update your personal info',
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const ProfileScreen()),
+        MaterialPageRoute(builder: (_) => const EditProfileScreen()),
       ),
     ),
     _settingsTile(
@@ -243,14 +248,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ),
   ];
 
-  List<Widget> _preferenceItems() => [
+  List<Widget> _preferenceItems(BuildContext context) => [
     _settingsTileWithToggle(
       icon: Icons.notifications_rounded,
       iconColor: AppColors.accent,
       title: 'Notifications',
       subtitle: 'Push, email notifications',
       value: _notificationsEnabled,
-      onChanged: (v) => setState(() => _notificationsEnabled = v),
+      onChanged: (v) {
+        setState(() => _notificationsEnabled = v);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const NotificationSettingsScreen()),
+        );
+      },
     ),
     _settingsTileWithToggle(
       icon: Icons.dark_mode_rounded,
@@ -258,7 +269,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       title: 'Dark Mode',
       subtitle: 'Toggle dark appearance',
       value: _darkModeEnabled,
-      onChanged: (v) => setState(() => _darkModeEnabled = v),
+      onChanged: (v) {
+        setState(() => _darkModeEnabled = v);
+        themeNotifier.value = v ? ThemeMode.dark : ThemeMode.light;
+      },
     ),
     _settingsTileWithDropdown(
       icon: Icons.language_rounded,
@@ -273,24 +287,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
       iconColor: AppColors.moduleAnimation,
       title: 'Privacy Settings',
       subtitle: 'Manage data & permissions',
-      onTap: () {},
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const PrivacySettingsScreen()),
+      ),
     ),
   ];
 
-  List<Widget> _supportItems() => [
+  List<Widget> _supportItems(BuildContext context) => [
     _settingsTile(
       icon: Icons.help_rounded,
       iconColor: AppColors.primary,
       title: 'Help & Support',
       subtitle: 'FAQs, contact us',
-      onTap: () {},
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const HelpSupportScreen()),
+      ),
     ),
     _settingsTile(
       icon: Icons.feedback_rounded,
       iconColor: AppColors.moduleAcademy,
       title: 'Send Feedback',
       subtitle: 'Share your thoughts',
-      onTap: () {},
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const HelpSupportScreen()),
+      ),
     ),
   ];
 

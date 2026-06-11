@@ -59,48 +59,48 @@ class DefaultFirebaseOptions {
   // ────────────────────────────────────────────────────────────────────────────
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'YOUR_WEB_API_KEY',
-    appId: 'YOUR_WEB_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    authDomain: 'YOUR_PROJECT_ID.firebaseapp.com',
-    storageBucket: 'YOUR_PROJECT_ID.firebasestorage.app',
+    apiKey: 'AIzaSyAyBiMV2fsOw8EWNNnzCLdYWk3oIIdKxvI',
+    appId: '1:88290025375:web:f60db9bd6f22f11109a7aa',
+    messagingSenderId: '88290025375',
+    projectId: 'learnova-281e0',
+    authDomain: 'learnova-281e0.firebaseapp.com',
+    storageBucket: 'learnova-281e0.firebasestorage.app',
+    measurementId: 'G-M8EFHHGRLP',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'YOUR_ANDROID_API_KEY',
-    appId: 'YOUR_ANDROID_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    storageBucket: 'YOUR_PROJECT_ID.firebasestorage.app',
+    apiKey: 'AIzaSyCGlNEMgXCpy6pn_t2zcNMRug7vivjKyKM',
+    appId: '1:88290025375:android:c7b49370e7234b7e09a7aa',
+    messagingSenderId: '88290025375',
+    projectId: 'learnova-281e0',
+    storageBucket: 'learnova-281e0.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'YOUR_IOS_API_KEY',
-    appId: 'YOUR_IOS_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    storageBucket: 'YOUR_PROJECT_ID.firebasestorage.app',
-    iosClientId: 'YOUR_IOS_CLIENT_ID',
-    iosBundleId: 'com.example.learnnova',
+    apiKey: 'AIzaSyCwi3eF__JTylUkROPgkaUJBYEbf2R7Uoo',
+    appId: '1:88290025375:ios:2ce89962f55c619a09a7aa',
+    messagingSenderId: '88290025375',
+    projectId: 'learnova-281e0',
+    storageBucket: 'learnova-281e0.firebasestorage.app',
+    iosClientId: '88290025375-gkso1sl38vouh0ssdh8i4m1hlrfjtt5v.apps.googleusercontent.com',
+    iosBundleId: 'com.learnnova.learnnova',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'YOUR_MACOS_API_KEY',
-    appId: 'YOUR_MACOS_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    storageBucket: 'YOUR_PROJECT_ID.firebasestorage.app',
-    iosClientId: 'YOUR_MACOS_CLIENT_ID',
-    iosBundleId: 'com.example.learnnova',
+    apiKey: 'AIzaSyCwi3eF__JTylUkROPgkaUJBYEbf2R7Uoo',
+    appId: '1:88290025375:ios:2ce89962f55c619a09a7aa',
+    messagingSenderId: '88290025375',
+    projectId: 'learnova-281e0',
+    storageBucket: 'learnova-281e0.firebasestorage.app',
+    iosClientId: '88290025375-gkso1sl38vouh0ssdh8i4m1hlrfjtt5v.apps.googleusercontent.com',
+    iosBundleId: 'com.learnnova.learnnova',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'YOUR_WINDOWS_API_KEY',
-    appId: 'YOUR_WINDOWS_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    authDomain: 'YOUR_PROJECT_ID.firebaseapp.com',
-    storageBucket: 'YOUR_PROJECT_ID.firebasestorage.app',
+    apiKey: 'AIzaSyAyBiMV2fsOw8EWNNnzCLdYWk3oIIdKxvI',
+    appId: '1:88290025375:web:05e5a0ef1dd7f37b09a7aa',
+    messagingSenderId: '88290025375',
+    projectId: 'learnova-281e0',
+    authDomain: 'learnova-281e0.firebaseapp.com',
+    storageBucket: 'learnova-281e0.firebasestorage.app',
+    measurementId: 'G-VSSRSVFLLL',
   );
 }
