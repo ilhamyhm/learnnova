@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../../constants/app_colors.dart';
 import '../../services/module_state_service.dart';
+import '../../services/streak_service.dart';
 
 class ProgressScreen extends StatefulWidget {
   const ProgressScreen({super.key});
@@ -40,14 +41,19 @@ class _ProgressScreenState extends State<ProgressScreen>
     return modules.map((m) => m.overallProgress).reduce((a, b) => a + b) / modules.length;
   }
 
-  int get _completedModules =>
+  // Number of fully completed parent modules (all subs done + quiz passed)
+  int get _completedModuleCount =>
+      ModuleStateService.instance.modules
+          .where((m) => m.allSubModulesCompleted)
+          .length;
+
+  int get _totalModuleCount => ModuleStateService.instance.modules.length;
+
+  // Number of individual completed sub-modules (for legacy stat card)
+  int get _completedSubModules =>
       ModuleStateService.instance.modules.expand((m) => m.subModules).where((s) => s.isCompleted).length;
 
-  int get _totalLessons {
-    final subs = ModuleStateService.instance.modules.expand((m) => m.subModules).toList();
-    if (subs.isEmpty) return 0;
-    return subs.map((s) => s.totalLessons).reduce((a, b) => a + b);
-  }
+  int _streak = 0;
 
   @override
   void initState() {
@@ -60,6 +66,12 @@ class _ProgressScreenState extends State<ProgressScreen>
       CurvedAnimation(parent: _animController, curve: Curves.easeInOut),
     );
     _animController.forward();
+    _loadStreak();
+  }
+
+  Future<void> _loadStreak() async {
+    final s = await StreakService.instance.getStreak();
+    if (mounted) setState(() => _streak = s);
   }
 
   @override
@@ -125,10 +137,10 @@ class _ProgressScreenState extends State<ProgressScreen>
                 color: AppColors.accent,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Column(
+              child: Column(
                 children: [
-                  Text('🔥 12', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
-                  Text('day streak', style: TextStyle(color: Colors.white70, fontSize: 9)),
+                  Text('🔥 $_streak', style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
+                  const Text('day streak', style: TextStyle(color: Colors.white70, fontSize: 9)),
                 ],
               ),
             ),
@@ -234,11 +246,11 @@ class _ProgressScreenState extends State<ProgressScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          Expanded(child: _statCard(context, '📚', '$_completedModules', 'Completed', AppColors.primary)),
+          Expanded(child: _statCard(context, '📦', '$_completedModuleCount/$_totalModuleCount', 'Modules', AppColors.primary)),
           const SizedBox(width: 12),
-          Expanded(child: _statCard(context, '🏆', '3', 'Certificates', AppColors.accent)),
+          Expanded(child: _statCard(context, '📚', '$_completedSubModules', 'Topics Done', AppColors.accent)),
           const SizedBox(width: 12),
-          Expanded(child: _statCard(context, '⏱️', '${(_totalLessons * 15 / 60).toStringAsFixed(0)}h', 'Hours', AppColors.moduleCreative)),
+          Expanded(child: _statCard(context, '🔥', '$_streak', 'Day Streak', AppColors.moduleAnimation)),
         ],
       ),
     );
@@ -456,8 +468,12 @@ class _ProgressScreenState extends State<ProgressScreen>
 
   Widget _buildCompletedModules(BuildContext context) {
     final colors = context.colors;
-    final completed = ModuleStateService.instance.modules.expand((m) => m.subModules).where((s) => s.isCompleted).toList();
-    if (completed.isEmpty) return const SizedBox.shrink();
+    // Show individual completed sub-modules in the list
+    final completedSubs = ModuleStateService.instance.modules
+        .expand((m) => m.subModules)
+        .where((s) => s.isCompleted)
+        .toList();
+    if (completedSubs.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -468,7 +484,7 @@ class _ProgressScreenState extends State<ProgressScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '✅ Completed Modules',
+                '✅ Completed Topics',
                 style: TextStyle(
                   color: colors.textPrimary,
                   fontSize: 18,
@@ -476,13 +492,13 @@ class _ProgressScreenState extends State<ProgressScreen>
                 ),
               ),
               Text(
-                '${completed.length} done',
+                '$_completedModuleCount / $_totalModuleCount modules',
                 style: TextStyle(color: colors.textSecondary, fontSize: 12),
               ),
             ],
           ),
         ),
-        ...completed.map((sub) => Container(
+        ...completedSubs.map((sub) => Container(
           margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(

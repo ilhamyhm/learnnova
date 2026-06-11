@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../models/module_model.dart';
 import '../../services/module_state_service.dart';
+import '../../services/streak_service.dart';
 import '../../widgets/category_item.dart';
 import '../home/category_detail_page.dart';
 import '../settings/profile_screen.dart';
@@ -16,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  int _streak = 0;
 
   List<Module> get _modules => ModuleStateService.instance.modules;
 
@@ -43,7 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadProgress() async {
     await ModuleStateService.instance.refreshAll();
-    if (mounted) setState(() {});
+    final streak = await StreakService.instance.getStreak();
+    if (mounted) setState(() => _streak = streak);
   }
 
   @override
@@ -305,8 +308,11 @@ class _HomeScreenState extends State<HomeScreen> {
         .expand((m) => m.subModules)
         .where((s) => s.isCompleted)
         .length;
-    final totalModules =
-        _modules.expand((m) => m.subModules).length;
+    final totalSubModules = _modules.expand((m) => m.subModules).length;
+    final completedModules = _modules
+        .where((m) => m.allSubModulesCompleted)
+        .length;
+    final totalModules = _modules.length;
     final overallProgress = _modules.isEmpty
         ? 0.0
         : _modules
@@ -339,11 +345,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   '${(overallProgress * 100).toInt()}%', 'Overall')),
           _divider(),
           Expanded(
-              child: _statItem('$totalCompleted', 'Completed')),
+              child: _statItem('$totalCompleted\n/ $totalSubModules', 'Done')),
           _divider(),
-          Expanded(child: _statItem('$totalModules', 'Lessons')),
+          Expanded(child: _statItem('$completedModules\n/ $totalModules', 'Modules')),
           _divider(),
-          Expanded(child: _statItem('12', 'Streak 🔥')),
+          Expanded(child: _statItem('$_streak', 'Streak 🔥')),
         ],
       ),
     );

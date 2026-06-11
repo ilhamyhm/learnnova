@@ -4,6 +4,7 @@ import '../../constants/app_colors.dart';
 import '../../models/material_model.dart';
 import '../../models/module_model.dart';
 import '../../services/api_service.dart';
+import '../../services/streak_service.dart';
 import '../../services/user_progress_service.dart';
 
 /// Displays learning slides for a submodule.
@@ -73,6 +74,8 @@ class _MaterialScreenState extends State<MaterialScreen> {
     final slide = materials[_currentIndex];
     if (!_viewedIds.contains(slide.materialId)) {
       await _progress.markSlideViewed(widget.subModule.apiKey, slide.materialId);
+      // Record streak activity whenever a new slide is viewed
+      await StreakService.instance.recordActivity();
       final newViewed = Set<int>.from(_viewedIds)..add(slide.materialId);
       await _progress.updateMaterialProgress(
         widget.subModule.apiKey,
