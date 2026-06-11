@@ -4,7 +4,6 @@ import '../../constants/app_colors.dart';
 import '../../constants/app_theme.dart';
 import '../../services/firebase_auth_service.dart';
 import '../auth/forgot_password_screen.dart';
-import '../auth/login_screen.dart';
 import 'edit_profile_screen.dart';
 import 'help_support_screen.dart';
 import 'notification_settings_screen.dart';
@@ -539,12 +538,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
+              // Only sign out — AuthWrapper's stream listener will
+              // automatically rebuild and show the LoginScreen.
+              // Do NOT navigate manually here; that causes a race condition
+              // that breaks subsequent logins.
               await FirebaseAuthService().signOut();
-              if (!context.mounted) return;
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-                (route) => false,
-              );
             },
             child: const Text('Log Out', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w700)),
           ),

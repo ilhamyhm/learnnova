@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../../constants/app_colors.dart';
-import '../../data/modules_data.dart';
+import '../../services/module_state_service.dart';
 
 class ProgressScreen extends StatefulWidget {
   const ProgressScreen({super.key});
@@ -35,14 +35,19 @@ class _ProgressScreenState extends State<ProgressScreen>
   ];
 
   double get _overallProgress {
-    return allModules.map((m) => m.overallProgress).reduce((a, b) => a + b) / allModules.length;
+    final modules = ModuleStateService.instance.modules;
+    if (modules.isEmpty) return 0.0;
+    return modules.map((m) => m.overallProgress).reduce((a, b) => a + b) / modules.length;
   }
 
   int get _completedModules =>
-      allModules.expand((m) => m.subModules).where((s) => s.isCompleted).length;
+      ModuleStateService.instance.modules.expand((m) => m.subModules).where((s) => s.isCompleted).length;
 
-  int get _totalLessons =>
-      allModules.expand((m) => m.subModules).map((s) => s.totalLessons).reduce((a, b) => a + b);
+  int get _totalLessons {
+    final subs = ModuleStateService.instance.modules.expand((m) => m.subModules).toList();
+    if (subs.isEmpty) return 0;
+    return subs.map((s) => s.totalLessons).reduce((a, b) => a + b);
+  }
 
   @override
   void initState() {
@@ -451,7 +456,7 @@ class _ProgressScreenState extends State<ProgressScreen>
 
   Widget _buildCompletedModules(BuildContext context) {
     final colors = context.colors;
-    final completed = allModules.expand((m) => m.subModules).where((s) => s.isCompleted).toList();
+    final completed = ModuleStateService.instance.modules.expand((m) => m.subModules).where((s) => s.isCompleted).toList();
     if (completed.isEmpty) return const SizedBox.shrink();
 
     return Column(

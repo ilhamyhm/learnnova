@@ -1,9 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
-import '../../data/modules_data.dart';
 import '../../services/firebase_auth_service.dart';
-import '../auth/login_screen.dart';
+import '../../services/module_state_service.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -34,19 +33,18 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
     if (confirm == true) {
+      // Pop back to the main scaffold first so AuthWrapper can take over
+      if (context.mounted) Navigator.of(context).popUntil((r) => r.isFirst);
       await FirebaseAuthService().signOut();
-      if (!context.mounted) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-        (route) => false,
-      );
+      // AuthWrapper stream will rebuild and show LoginScreen automatically
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final completedModules = allModules.expand((m) => m.subModules).where((s) => s.isCompleted).length;
-    final totalModules = allModules.expand((m) => m.subModules).length;
+    final modules = ModuleStateService.instance.modules;
+    final completedModules = modules.expand((m) => m.subModules).where((s) => s.isCompleted).length;
+    final totalModules = modules.expand((m) => m.subModules).length;
 
     return Scaffold(
       backgroundColor: AppColors.background,

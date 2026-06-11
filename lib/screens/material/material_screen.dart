@@ -4,6 +4,7 @@ import '../../constants/app_colors.dart';
 import '../../models/material_model.dart';
 import '../../models/module_model.dart';
 import '../../services/api_service.dart';
+import '../../services/user_progress_service.dart';
 
 /// Displays learning slides for a submodule.
 /// Loads materials dynamically from the API, supports Next/Previous navigation,
@@ -24,6 +25,7 @@ class MaterialScreen extends StatefulWidget {
 
 class _MaterialScreenState extends State<MaterialScreen> {
   final ApiService _api = ApiService();
+  final _progress = UserProgressService.instance;
 
   ModuleMaterialsResponse? _data;
   bool _isLoading = true;
@@ -45,7 +47,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
     });
     try {
       final data = await _api.fetchMaterials(widget.subModule.apiKey);
-      final viewed = await _api.getViewedSlides(widget.subModule.apiKey);
+      final viewed = await _progress.getViewedSlides(widget.subModule.apiKey);
       if (!mounted) return;
       setState(() {
         _data = data;
@@ -70,9 +72,9 @@ class _MaterialScreenState extends State<MaterialScreen> {
     if (materials == null || _currentIndex >= materials.length) return;
     final slide = materials[_currentIndex];
     if (!_viewedIds.contains(slide.materialId)) {
-      await _api.markSlideViewed(widget.subModule.apiKey, slide.materialId);
+      await _progress.markSlideViewed(widget.subModule.apiKey, slide.materialId);
       final newViewed = Set<int>.from(_viewedIds)..add(slide.materialId);
-      await _api.updateMaterialProgress(
+      await _progress.updateMaterialProgress(
         widget.subModule.apiKey,
         newViewed.length,
         materials.length,

@@ -3,6 +3,7 @@ import '../../constants/app_colors.dart';
 import '../../models/module_model.dart';
 import '../../models/quiz_model.dart';
 import '../../services/api_service.dart';
+import '../../services/user_progress_service.dart';
 import 'quiz_result_screen.dart';
 
 /// Quiz screen: loads questions from the API and presents them one at a time.
@@ -23,6 +24,7 @@ class QuizScreen extends StatefulWidget {
 
 class _QuizScreenState extends State<QuizScreen> {
   final ApiService _api = ApiService();
+  final _progress = UserProgressService.instance;
 
   ModuleQuizResponse? _quiz;
   bool _isLoading = true;
@@ -90,7 +92,7 @@ class _QuizScreenState extends State<QuizScreen> {
     final passed = score >= 60;
 
     // Save quiz result and update module progress
-    await _api.saveQuizResult(widget.module.apiKey, score, passed);
+    await _progress.saveQuizResult(widget.module.apiKey, score, passed);
     if (passed) {
       for (final sub in widget.module.subModules) {
         sub.progress = 1.0;
