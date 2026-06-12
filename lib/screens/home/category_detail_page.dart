@@ -386,6 +386,23 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                               fontWeight: FontWeight.w700,
                             ),
                           ),
+                        )
+                      else if (sub.allMaterialsCompleted)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: colors.accentLight,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'Materials Completed',
+                            style: TextStyle(
+                              color: AppColors.accent,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
                     ],
                   ),
