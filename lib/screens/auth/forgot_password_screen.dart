@@ -151,12 +151,23 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
           width: 56,
           height: 56,
           decoration: BoxDecoration(
-            color: AppColors.primarySurface,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.2),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-          child: const Center(
-            child: Text('🔑', style: TextStyle(fontSize: 28)),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(18),
+            child: Image.asset(
+              'lib/logo/logo.jpeg',
+              width: 56,
+              height: 56,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         const SizedBox(height: 16),
