@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../models/module_model.dart';
 import '../../models/quiz_model.dart';
+import '../../services/app_localizations.dart';
 import 'quiz_review_screen.dart';
 
 /// Displays the quiz completion result: score, pass/fail status,
@@ -94,7 +95,7 @@ class QuizResultScreen extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  passed ? '✓ PASSED' : '✗ FAILED — Try Again',
+                  passed ? '✓ ${context.tr('passed_badge')}' : '✗ ${context.tr('failed_badge')}',
                   style: TextStyle(
                     color: passed ? AppColors.success : Colors.red.shade600,
                     fontSize: 13,
@@ -131,7 +132,7 @@ class QuizResultScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${result.correctAnswers} out of ${result.totalQuestions} correct',
+                      '${result.correctAnswers} ${context.tr('of')} ${result.totalQuestions} ${context.tr('correct')}',
                       style: TextStyle(
                         color: colors.textSecondary,
                         fontSize: 14,
@@ -155,21 +156,21 @@ class QuizResultScreen extends StatelessWidget {
                       children: [
                         _statChip(
                           '✓ ${result.correctAnswers}',
-                          'Correct',
+                          context.tr('correct_label'),
                           AppColors.success,
                           colors,
                         ),
                         const SizedBox(width: 10),
                         _statChip(
                           '✗ ${result.totalQuestions - result.correctAnswers}',
-                          'Wrong',
+                          context.tr('wrong_label'),
                           Colors.red.shade400,
                           colors,
                         ),
                         const SizedBox(width: 10),
                         _statChip(
                           '${result.totalQuestions}',
-                          'Total',
+                          context.tr('total_label'),
                           color,
                           colors,
                         ),
@@ -208,8 +209,8 @@ class QuizResultScreen extends StatelessWidget {
                     Expanded(
                       child: Text(
                         passed
-                            ? 'Congratulations! The topic "${subModule.name}" is now marked as completed.'
-                            : 'Minimum passing score is 60%. Review the materials and try again.',
+                            ? context.tr('quiz_passed_congrats').replaceAll('{topic}', subModule.name)
+                            : context.tr('min_passing_score_info'),
                         style: TextStyle(
                           color: passed
                               ? AppColors.success
@@ -241,9 +242,9 @@ class QuizResultScreen extends StatelessWidget {
                     );
                   },
                   icon: const Icon(Icons.rate_review_rounded, size: 20),
-                  label: const Text(
-                    'Review Answers',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                  label: Text(
+                    context.tr('review_answers'),
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: passed ? AppColors.success : color,
@@ -265,9 +266,9 @@ class QuizResultScreen extends StatelessWidget {
                       Navigator.pop(context);
                     },
                     icon: const Icon(Icons.replay_rounded, size: 20),
-                    label: const Text(
-                      'Retake Quiz',
-                      style: TextStyle(
+                    label: Text(
+                      context.tr('retake_quiz'),
+                      style: const TextStyle(
                           fontSize: 15, fontWeight: FontWeight.w700),
                     ),
                     style: OutlinedButton.styleFrom(
@@ -290,9 +291,9 @@ class QuizResultScreen extends StatelessWidget {
                     Navigator.pop(context);
                   },
                   icon: const Icon(Icons.arrow_back_rounded, size: 20),
-                  label: const Text(
-                    'Back to Topic',
-                    style: TextStyle(
+                  label: Text(
+                    context.tr('back_to_topic'),
+                    style: const TextStyle(
                         fontSize: 15, fontWeight: FontWeight.w700),
                   ),
                   style: OutlinedButton.styleFrom(

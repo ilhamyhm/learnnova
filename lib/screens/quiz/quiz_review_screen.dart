@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../models/quiz_model.dart';
+import '../../services/app_localizations.dart';
 
 class QuizReviewScreen extends StatelessWidget {
   final QuizResult result;
@@ -31,9 +32,9 @@ class QuizReviewScreen extends StatelessWidget {
             child: const Icon(Icons.arrow_back_rounded, color: Colors.white),
           ),
         ),
-        title: const Text(
-          'Quiz Review',
-          style: TextStyle(
+        title: Text(
+          context.tr('quiz_review_title'),
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -59,9 +60,9 @@ class QuizReviewScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _statItem('Score', '${result.scorePercent.toInt()}%', Colors.white),
-                  _statItem('Correct', '${result.correctAnswers}', Colors.white70),
-                  _statItem('Wrong', '${result.totalQuestions - result.correctAnswers}', Colors.white70),
+                  _statItem(context.tr('score_label'), '${result.scorePercent.toInt()}%', Colors.white),
+                  _statItem(context.tr('correct_label'), '${result.correctAnswers}', Colors.white70),
+                  _statItem(context.tr('wrong_label'), '${result.totalQuestions - result.correctAnswers}', Colors.white70),
                 ],
               ),
             ),
@@ -157,7 +158,7 @@ class QuizReviewScreen extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                isCorrect ? 'Correct ✓' : 'Incorrect ✗',
+                isCorrect ? '${context.tr('correct_feedback').replaceAll('!', '')} ✓' : '${context.tr('incorrect_feedback')} ✗',
                 style: TextStyle(
                   color: isCorrect ? AppColors.success : Colors.red.shade600,
                   fontSize: 12,
@@ -200,7 +201,7 @@ class QuizReviewScreen extends StatelessWidget {
                     const Icon(Icons.info_outline_rounded, size: 16, color: AppColors.primary),
                     const SizedBox(width: 6),
                     Text(
-                      'Explanation',
+                      context.tr('explanation_label'),
                       style: TextStyle(
                         color: colors.textPrimary,
                         fontSize: 12,

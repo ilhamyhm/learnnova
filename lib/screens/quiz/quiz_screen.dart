@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
+import '../../services/app_localizations.dart';
 import '../../models/module_model.dart';
 import '../../models/quiz_model.dart';
 import '../../services/api_service.dart';
@@ -60,7 +61,7 @@ class _QuizScreenState extends State<QuizScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = 'Failed to load quiz. Please try again.';
+        _error = context.tr('failed_load_quiz');
         _isLoading = false;
       });
     }
@@ -172,8 +173,8 @@ class _QuizScreenState extends State<QuizScreen> {
           CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(color)),
           const SizedBox(height: 16),
-          const Text('Loading quiz...',
-              style: TextStyle(color: AppColors.textSecondary)),
+          Text(context.tr('loading_quiz'),
+              style: const TextStyle(color: AppColors.textSecondary)),
         ],
       ),
     );
@@ -197,7 +198,7 @@ class _QuizScreenState extends State<QuizScreen> {
             ElevatedButton.icon(
               onPressed: _loadQuiz,
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Retry'),
+              label: Text(context.tr('retry')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
@@ -233,7 +234,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Question ${_currentQuestion + 1} of ${questions.length}',
+                    '${context.tr('question_label')} ${_currentQuestion + 1} ${context.tr('of')} ${questions.length}',
                     style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 13,
@@ -247,7 +248,7 @@ class _QuizScreenState extends State<QuizScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      '✓ $_correctCount correct',
+                      '✓ $_correctCount ${context.tr('correct')}',
                       style: const TextStyle(
                           color: Colors.white,
                           fontSize: 11,
@@ -365,8 +366,8 @@ class _QuizScreenState extends State<QuizScreen> {
                           Expanded(
                             child: Text(
                               _selectedAnswer == q.correctAnswer
-                                  ? 'Correct! 🎉'
-                                  : 'Correct answer: ${q.correctAnswer}',
+                                  ? context.tr('correct_feedback')
+                                  : context.tr('correct_answer_is').replaceAll('{ans}', q.correctAnswer),
                               style: TextStyle(
                                 color: _selectedAnswer == q.correctAnswer
                                     ? AppColors.success
@@ -481,7 +482,7 @@ class _QuizScreenState extends State<QuizScreen> {
             size: 20,
           ),
           label: Text(
-            isLast ? 'See Results' : 'Next Question',
+            isLast ? context.tr('see_results') : context.tr('next_question'),
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
           ),
           style: ElevatedButton.styleFrom(

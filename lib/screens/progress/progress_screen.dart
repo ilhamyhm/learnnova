@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import '../../constants/app_colors.dart';
 import '../../services/module_state_service.dart';
 import '../../services/streak_service.dart';
+import '../../services/app_localizations.dart';
 
 class ProgressScreen extends StatefulWidget {
   const ProgressScreen({super.key});
@@ -179,21 +180,21 @@ class _ProgressScreenState extends State<ProgressScreen>
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Column(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'My Progress',
-                  style: TextStyle(
+                  context.tr('progress_title'),
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 26,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
-                  'Track your learning journey',
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                  context.tr('track_journey'),
+                  style: const TextStyle(color: Colors.white70, fontSize: 13),
                 ),
               ],
             ),
@@ -210,8 +211,8 @@ class _ProgressScreenState extends State<ProgressScreen>
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.w800)),
-                  const Text('day streak',
-                      style: TextStyle(color: Colors.white70, fontSize: 9)),
+                  Text(context.tr('day_streak'),
+                      style: const TextStyle(color: Colors.white70, fontSize: 9)),
                 ],
               ),
             ),
@@ -240,7 +241,7 @@ class _ProgressScreenState extends State<ProgressScreen>
       child: Column(
         children: [
           Text(
-            'Overall Completion',
+            context.tr('overall_completion'),
             style: TextStyle(
               color: colors.textPrimary,
               fontSize: 16,
@@ -293,13 +294,13 @@ class _ProgressScreenState extends State<ProgressScreen>
             children: [
               _legendDot(AppColors.primary),
               const SizedBox(width: 6),
-              Text('Completed',
+              Text(context.tr('completed'),
                   style:
                       TextStyle(color: colors.textSecondary, fontSize: 12)),
               const SizedBox(width: 16),
               _legendDot(colors.surface),
               const SizedBox(width: 6),
-              Text('Remaining',
+              Text(context.tr('remaining'),
                   style:
                       TextStyle(color: colors.textSecondary, fontSize: 12)),
             ],
@@ -326,14 +327,14 @@ class _ProgressScreenState extends State<ProgressScreen>
             children: [
               Expanded(
                   child: _statCard(context, '📦',
-                      '$_completedModuleCount/$_totalModuleCount', 'Modules', AppColors.primary)),
+                      '$_completedModuleCount/$_totalModuleCount', context.tr('modules'), AppColors.primary)),
               const SizedBox(width: 12),
               Expanded(
                   child: _statCard(context, '📚', '$_completedSubModules/$_totalSubModules',
-                      'Topics Done', AppColors.accent)),
+                      context.tr('topics_done'), AppColors.accent)),
               const SizedBox(width: 12),
               Expanded(
-                  child: _statCard(context, '🔥', '$_streak', 'Day Streak',
+                  child: _statCard(context, '🔥', '$_streak', context.tr('day_streak_title'),
                       AppColors.moduleAnimation)),
             ],
           ),
@@ -342,15 +343,15 @@ class _ProgressScreenState extends State<ProgressScreen>
             children: [
               Expanded(
                   child: _statCard(context, '🏆',
-                      '$_passedQuizzesCount/$_totalSubModules', 'Quizzes Passed', AppColors.success)),
+                      '$_passedQuizzesCount/$_totalSubModules', context.tr('quizzes_passed'), AppColors.success)),
               const SizedBox(width: 12),
               Expanded(
                   child: _statCard(context, '📖', '$_completedLessonsCount/$_totalLessonsCount',
-                      'Lessons Done', AppColors.moduleLanguage)),
+                      context.tr('lessons_done'), AppColors.moduleLanguage)),
               const SizedBox(width: 12),
               Expanded(
                   child: _statCard(context, '🎯',
-                      '${_avgQuizScore.toInt()}%', 'Avg Score', const Color(0xFFE28743))),
+                      '${_avgQuizScore.toInt()}%', context.tr('avg_score_short'), const Color(0xFFE28743))),
             ],
           ),
         ],
@@ -418,7 +419,7 @@ class _ProgressScreenState extends State<ProgressScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Weekly Activity',
+                context.tr('weekly_activity'),
                 style: TextStyle(
                   color: colors.textPrimary,
                   fontSize: 16,
@@ -432,9 +433,9 @@ class _ProgressScreenState extends State<ProgressScreen>
                   color: colors.primarySurface,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Text(
-                  'This Week',
-                  style: TextStyle(
+                child: Text(
+                  context.tr('this_week'),
+                  style: const TextStyle(
                       color: AppColors.primary,
                       fontSize: 11,
                       fontWeight: FontWeight.w600),
@@ -480,7 +481,7 @@ class _ProgressScreenState extends State<ProgressScreen>
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      data['day'],
+                      context.tr(data['day'].toLowerCase()),
                       style: TextStyle(
                         color: isToday
                             ? AppColors.accent
@@ -509,7 +510,7 @@ class _ProgressScreenState extends State<ProgressScreen>
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
           child: Text(
-            '🏆 Achievement Badges',
+            '🏆 ${context.tr('achievement_badges')}',
             style: TextStyle(
               color: colors.textPrimary,
               fontSize: 18,
@@ -562,7 +563,7 @@ class _ProgressScreenState extends State<ProgressScreen>
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      badge['name'],
+                      context.tr('badge_${badge['name'].toLowerCase().replaceAll(' ', '_')}'),
                       style: TextStyle(
                         color: earned
                             ? colors.textPrimary
@@ -605,7 +606,7 @@ class _ProgressScreenState extends State<ProgressScreen>
               const Text('📚', style: TextStyle(fontSize: 40)),
               const SizedBox(height: 12),
               Text(
-                'No topics completed yet',
+                context.tr('no_topics_completed'),
                 style: TextStyle(
                     color: colors.textPrimary,
                     fontSize: 15,
@@ -613,7 +614,7 @@ class _ProgressScreenState extends State<ProgressScreen>
               ),
               const SizedBox(height: 4),
               Text(
-                'Complete all 16 materials + the quiz to finish a topic.',
+                context.tr('complete_to_finish'),
                 style: TextStyle(color: colors.textSecondary, fontSize: 12),
                 textAlign: TextAlign.center,
               ),
@@ -632,7 +633,7 @@ class _ProgressScreenState extends State<ProgressScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '✅ Completed Topics',
+                '✅ ${context.tr('completed_topics')}',
                 style: TextStyle(
                   color: colors.textPrimary,
                   fontSize: 18,
@@ -640,7 +641,7 @@ class _ProgressScreenState extends State<ProgressScreen>
                 ),
               ),
               Text(
-                '$_completedModuleCount / $_totalModuleCount modules',
+                '$_completedModuleCount / $_totalModuleCount ${context.tr('modules').toLowerCase()}',
                 style:
                     TextStyle(color: colors.textSecondary, fontSize: 12),
               ),
@@ -684,7 +685,7 @@ class _ProgressScreenState extends State<ProgressScreen>
                           ),
                         ),
                         Text(
-                          '${sub.totalLessons} lessons • Quiz Passed ✓',
+                          '${sub.totalLessons} ${context.tr('lessons')} • ${context.tr('quiz_passed')} ✓',
                           style: TextStyle(
                               color: colors.textSecondary, fontSize: 11),
                         ),
@@ -698,9 +699,9 @@ class _ProgressScreenState extends State<ProgressScreen>
                       color: AppColors.success,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Text(
-                      '✓ Done',
-                      style: TextStyle(
+                    child: Text(
+                      '✓ ${context.tr('done_cap')}',
+                      style: const TextStyle(
                           color: Colors.white,
                           fontSize: 11,
                           fontWeight: FontWeight.w700),
