@@ -4,6 +4,7 @@ class SubModule {
   final String description;
   final String icon;
   final int totalLessons;
+  final String difficulty; // e.g. 'Beginner', 'Intermediate', 'Advanced'
 
   /// Key used to fetch materials from the API (e.g. "codelab_html").
   final String apiKey;
@@ -22,6 +23,7 @@ class SubModule {
     required this.icon,
     required this.apiKey,
     this.totalLessons = 3,
+    this.difficulty = 'Beginner',
     this.progress = 0.0,
     this.isCompleted = false,
     this.isQuizPassed = false,
