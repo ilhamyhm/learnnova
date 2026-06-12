@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../models/module_model.dart';
 import '../../models/quiz_model.dart';
+import 'quiz_review_screen.dart';
 
 /// Displays the quiz completion result: score, pass/fail status,
 /// and action buttons to retry or return to the module.
@@ -21,12 +22,13 @@ class QuizResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final color = moduleColor;
     final score = result.scorePercent;
     final passed = result.isPassed;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -69,8 +71,8 @@ class QuizResultScreen extends StatelessWidget {
               // Quiz title
               Text(
                 result.quizTitle,
-                style: const TextStyle(
-                  color: AppColors.textPrimary,
+                style: TextStyle(
+                  color: colors.textPrimary,
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
                 ),
@@ -107,7 +109,7 @@ class QuizResultScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: AppColors.cardBg,
+                  color: colors.cardBg,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
@@ -130,8 +132,8 @@ class QuizResultScreen extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       '${result.correctAnswers} out of ${result.totalQuestions} correct',
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
+                      style: TextStyle(
+                        color: colors.textSecondary,
                         fontSize: 14,
                       ),
                     ),
@@ -140,7 +142,7 @@ class QuizResultScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                       child: LinearProgressIndicator(
                         value: score / 100,
-                        backgroundColor: AppColors.surface,
+                        backgroundColor: colors.surface,
                         valueColor: AlwaysStoppedAnimation<Color>(
                           passed ? AppColors.success : Colors.red.shade400,
                         ),
@@ -155,18 +157,21 @@ class QuizResultScreen extends StatelessWidget {
                           '✓ ${result.correctAnswers}',
                           'Correct',
                           AppColors.success,
+                          colors,
                         ),
                         const SizedBox(width: 10),
                         _statChip(
                           '✗ ${result.totalQuestions - result.correctAnswers}',
                           'Wrong',
                           Colors.red.shade400,
+                          colors,
                         ),
                         const SizedBox(width: 10),
                         _statChip(
                           '${result.totalQuestions}',
                           'Total',
                           color,
+                          colors,
                         ),
                       ],
                     ),
@@ -180,7 +185,7 @@ class QuizResultScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: passed
-                      ? AppColors.successLight
+                      ? colors.successLight
                       : Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
@@ -221,27 +226,56 @@ class QuizResultScreen extends StatelessWidget {
               const SizedBox(height: 32),
 
               // Action buttons
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => QuizReviewScreen(
+                          result: result,
+                          moduleColor: color,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.rate_review_rounded, size: 20),
+                  label: const Text(
+                    'Review Answers',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: passed ? AppColors.success : color,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                    elevation: 0,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
               if (!passed) ...[
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton.icon(
+                  child: OutlinedButton.icon(
                     onPressed: () {
                       // Pop result and quiz screens, return to module
                       Navigator.pop(context);
                     },
                     icon: const Icon(Icons.replay_rounded, size: 20),
                     label: const Text(
-                      'Retry Quiz',
+                      'Retake Quiz',
                       style: TextStyle(
                           fontSize: 15, fontWeight: FontWeight.w700),
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: color,
-                      foregroundColor: Colors.white,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: color,
+                      side: BorderSide(color: color.withValues(alpha: 0.4)),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16)),
-                      elevation: 0,
                     ),
                   ),
                 ),
@@ -262,9 +296,8 @@ class QuizResultScreen extends StatelessWidget {
                         fontSize: 15, fontWeight: FontWeight.w700),
                   ),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: color,
-                    side:
-                        BorderSide(color: color.withValues(alpha: 0.4)),
+                    foregroundColor: colors.textSecondary,
+                    side: BorderSide(color: colors.divider),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16)),
@@ -279,7 +312,7 @@ class QuizResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _statChip(String value, String label, Color color) {
+  Widget _statChip(String value, String label, Color color, dynamic colors) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -300,8 +333,8 @@ class QuizResultScreen extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               label,
-              style: const TextStyle(
-                color: AppColors.textSecondary,
+              style: TextStyle(
+                color: colors.textSecondary as Color,
                 fontSize: 10,
               ),
             ),
