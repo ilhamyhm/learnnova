@@ -4,7 +4,8 @@ import 'package:flutter/services.dart';
 import 'constants/app_colors.dart';
 import 'constants/app_theme.dart';
 import 'firebase_options.dart';
-import 'screens/auth/auth_wrapper.dart';
+
+import 'screens/splash/splash_screen.dart';
 import 'screens/explorer/explorer_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/progress/progress_screen.dart';
@@ -57,7 +58,7 @@ class LearnNovaApp extends StatelessWidget {
           theme: _buildTheme(),
           darkTheme: _buildDarkTheme(),
           themeMode: mode,
-          home: const AuthWrapper(),
+          home: const SplashScreen(),
         );
       },
     );
