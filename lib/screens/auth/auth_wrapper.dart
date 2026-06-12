@@ -88,7 +88,6 @@ class _SplashLoading extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
@@ -98,8 +97,14 @@ class _SplashLoading extends StatelessWidget {
                   ),
                 ],
               ),
-              child: const Center(
-                child: Text('📚', style: TextStyle(fontSize: 38)),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: Image.asset(
+                  'lib/logo/logo.jpeg',
+                  width: 80,
+                  height: 80,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             const SizedBox(height: 20),
