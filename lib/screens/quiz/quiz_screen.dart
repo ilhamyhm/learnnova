@@ -37,6 +37,7 @@ class _QuizScreenState extends State<QuizScreen> {
   String? _selectedAnswer;
   bool _answered = false;
   int _correctCount = 0;
+  final Map<int, String> _userAnswers = {};
 
   @override
   void initState() {
@@ -71,6 +72,7 @@ class _QuizScreenState extends State<QuizScreen> {
     setState(() {
       _selectedAnswer = answer;
       _answered = true;
+      _userAnswers[_currentQuestion] = answer;
       if (answer == correct) _correctCount++;
     });
   }
@@ -114,6 +116,8 @@ class _QuizScreenState extends State<QuizScreen> {
             quizTitle: _quiz!.quizTitle,
             totalQuestions: total,
             correctAnswers: _correctCount,
+            questions: _quiz!.questions,
+            userAnswers: _userAnswers,
           ),
           module: widget.module,
           subModule: widget.subModule,
