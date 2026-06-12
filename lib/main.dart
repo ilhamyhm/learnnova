@@ -1,9 +1,14 @@
+import 'dart:ui' as ui;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'constants/app_colors.dart';
+import 'constants/app_locale.dart';
 import 'constants/app_theme.dart';
 import 'firebase_options.dart';
+import 'services/app_localizations.dart';
 
 import 'screens/splash/splash_screen.dart';
 import 'screens/explorer/explorer_screen.dart';
@@ -18,6 +23,20 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Initialize locale settings
+  final prefs = await SharedPreferences.getInstance();
+  final String? savedLang = prefs.getString('language_code');
+  if (savedLang != null) {
+    localeNotifier.value = Locale(savedLang);
+  } else {
+    final String systemLang = ui.PlatformDispatcher.instance.locale.languageCode;
+    if (systemLang == 'id') {
+      localeNotifier.value = const Locale('id');
+    } else {
+      localeNotifier.value = const Locale('en');
+    }
+  }
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -42,23 +61,39 @@ class LearnNovaApp extends StatelessWidget {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: themeNotifier,
       builder: (context, mode, child) {
-        // Update system UI overlay when theme changes
-        final isDark = mode == ThemeMode.dark;
-        SystemChrome.setSystemUIOverlayStyle(
-          SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
-            statusBarIconBrightness: isDark ? Brightness.light : Brightness.light,
-            systemNavigationBarColor: isDark ? const Color(0xFF0D0F1A) : AppColors.white,
-            systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-          ),
-        );
-        return MaterialApp(
-          title: 'LearnNova',
-          debugShowCheckedModeBanner: false,
-          theme: _buildTheme(),
-          darkTheme: _buildDarkTheme(),
-          themeMode: mode,
-          home: const SplashScreen(),
+        return ValueListenableBuilder<Locale>(
+          valueListenable: localeNotifier,
+          builder: (context, locale, child) {
+            // Update system UI overlay when theme changes
+            final isDark = mode == ThemeMode.dark;
+            SystemChrome.setSystemUIOverlayStyle(
+              SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: isDark ? Brightness.light : Brightness.light,
+                systemNavigationBarColor: isDark ? const Color(0xFF0D0F1A) : AppColors.white,
+                systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+              ),
+            );
+            return MaterialApp(
+              title: 'LearnNova',
+              debugShowCheckedModeBanner: false,
+              theme: _buildTheme(),
+              darkTheme: _buildDarkTheme(),
+              themeMode: mode,
+              locale: locale,
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: const [
+                Locale('en'),
+                Locale('id'),
+              ],
+              home: const SplashScreen(),
+            );
+          },
         );
       },
     );
@@ -347,6 +382,21 @@ class _MainScaffoldState extends State<MainScaffold>
     );
   }
 
+  String _getTranslatedLabel(String label) {
+    switch (label.toLowerCase()) {
+      case 'home':
+        return context.tr('home_title');
+      case 'explorer':
+        return context.tr('explorer_title');
+      case 'progress':
+        return context.tr('progress_title');
+      case 'settings':
+        return context.tr('settings_title').replaceAll(' ⚙️', '');
+      default:
+        return label;
+    }
+  }
+
   Widget _buildNavItem(_NavItem item, int index, bool isActive) {
     final colors = context.colors;
     return GestureDetector(
@@ -379,7 +429,7 @@ class _MainScaffoldState extends State<MainScaffold>
                   ? Padding(
                       padding: const EdgeInsets.only(left: 6),
                       child: Text(
-                        item.label,
+                        _getTranslatedLabel(item.label),
                         style: const TextStyle(
                           color: AppColors.primary,
                           fontSize: 13,
