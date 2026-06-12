@@ -74,28 +74,28 @@ class UserProgressService {
 
   // ─── Quiz Results ─────────────────────────────────────────────────────────
 
-  /// Returns the saved quiz score for [moduleKey], or null if not attempted.
-  Future<double?> getQuizScore(String moduleKey) async {
+  /// Returns the saved quiz score for [subModuleKey], or null if not attempted.
+  Future<double?> getQuizScore(String subModuleKey) async {
     final prefs = await SharedPreferences.getInstance();
-    final k = _key(_pfxScore, moduleKey);
+    final k = _key(_pfxScore, subModuleKey);
     return prefs.containsKey(k) ? prefs.getDouble(k) : null;
   }
 
-  /// Returns whether the [moduleKey] quiz was passed.
-  Future<bool> isQuizPassed(String moduleKey) async {
+  /// Returns whether the [subModuleKey] quiz was passed.
+  Future<bool> isQuizPassed(String subModuleKey) async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_key(_pfxPassed, moduleKey)) ?? false;
+    return prefs.getBool(_key(_pfxPassed, subModuleKey)) ?? false;
   }
 
-  /// Saves a quiz result for [moduleKey].
+  /// Saves a quiz result for [subModuleKey].
   Future<void> saveQuizResult(
-    String moduleKey,
+    String subModuleKey,
     double scorePercent,
     bool passed,
   ) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble(_key(_pfxScore, moduleKey), scorePercent);
-    await prefs.setBool(_key(_pfxPassed, moduleKey), passed);
+    await prefs.setDouble(_key(_pfxScore, subModuleKey), scorePercent);
+    await prefs.setBool(_key(_pfxPassed, subModuleKey), passed);
   }
 
   /// Clears **all** progress data for the current user only.
