@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../services/firebase_auth_service.dart';
+import '../../services/app_localizations.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -70,7 +71,7 @@ class _RegisterScreenState extends State<RegisterScreen>
       _showError(FirebaseAuthService.friendlyError(e));
     } catch (_) {
       if (!mounted) return;
-      _showError('An unexpected error occurred. Please try again.');
+      _showError(context.tr('register_failed'));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -98,14 +99,14 @@ class _RegisterScreenState extends State<RegisterScreen>
   /// Returns a password strength label and color.
   ({String label, Color color}) _passwordStrength(String password) {
     if (password.isEmpty) return (label: '', color: Colors.transparent);
-    if (password.length < 6) return (label: 'Weak', color: AppColors.error);
+    if (password.length < 6) return (label: 'weak', color: AppColors.error);
     final hasUpper = RegExp(r'[A-Z]').hasMatch(password);
     final hasDigit = RegExp(r'\d').hasMatch(password);
     final hasSpecial = RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password);
     final score = [hasUpper, hasDigit, hasSpecial].where((b) => b).length;
-    if (score == 0) return (label: 'Fair', color: AppColors.warning);
-    if (score == 1) return (label: 'Good', color: AppColors.accent);
-    return (label: 'Strong', color: AppColors.success);
+    if (score == 0) return (label: 'fair', color: AppColors.warning);
+    if (score == 1) return (label: 'good', color: AppColors.accent);
+    return (label: 'strong', color: AppColors.success);
   }
 
   // ── Build ────────────────────────────────────────────────────────────────────
@@ -199,9 +200,9 @@ class _RegisterScreenState extends State<RegisterScreen>
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
-          'Create Account',
-          style: TextStyle(
+        Text(
+          context.tr('create_account'),
+          style: const TextStyle(
             color: AppColors.textPrimary,
             fontSize: 24,
             fontWeight: FontWeight.w800,
@@ -209,8 +210,8 @@ class _RegisterScreenState extends State<RegisterScreen>
         ),
         const SizedBox(height: 4),
         Text(
-          'Join LearnNova and start learning smarter.',
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+          context.tr('join_learnnova'),
+          style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
         ),
       ],
     );
@@ -271,13 +272,13 @@ class _RegisterScreenState extends State<RegisterScreen>
   Widget _buildNameField() {
     return _buildInputField(
       controller: _nameCtrl,
-      label: 'Full Name',
-      hint: 'Your full name',
+      label: context.tr('full_name'),
+      hint: context.tr('your_full_name'),
       icon: Icons.person_outline_rounded,
       keyboardType: TextInputType.name,
       validator: (v) {
-        if (v == null || v.trim().isEmpty) return 'Please enter your full name.';
-        if (v.trim().length < 2) return 'Name must be at least 2 characters.';
+        if (v == null || v.trim().isEmpty) return context.tr('name_required');
+        if (v.trim().length < 2) return context.tr('name_too_short');
         return null;
       },
     );
@@ -286,14 +287,14 @@ class _RegisterScreenState extends State<RegisterScreen>
   Widget _buildEmailField() {
     return _buildInputField(
       controller: _emailCtrl,
-      label: 'Email Address',
+      label: context.tr('email_address'),
       hint: 'you@example.com',
       icon: Icons.email_outlined,
       keyboardType: TextInputType.emailAddress,
       validator: (v) {
-        if (v == null || v.trim().isEmpty) return 'Please enter your email.';
+        if (v == null || v.trim().isEmpty) return context.tr('email_required');
         final emailRegex = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,}$');
-        if (!emailRegex.hasMatch(v.trim())) return 'Enter a valid email address.';
+        if (!emailRegex.hasMatch(v.trim())) return context.tr('email_invalid');
         return null;
       },
     );
@@ -306,7 +307,7 @@ class _RegisterScreenState extends State<RegisterScreen>
       children: [
         _buildInputField(
           controller: _passwordCtrl,
-          label: 'Password',
+          label: context.tr('password'),
           hint: '••••••••',
           icon: Icons.lock_outline_rounded,
           obscure: _obscurePassword,
@@ -323,8 +324,8 @@ class _RegisterScreenState extends State<RegisterScreen>
                 setState(() => _obscurePassword = !_obscurePassword),
           ),
           validator: (v) {
-            if (v == null || v.isEmpty) return 'Please enter a password.';
-            if (v.length < 6) return 'Password must be at least 6 characters.';
+            if (v == null || v.isEmpty) return context.tr('password_required');
+            if (v.length < 6) return context.tr('password_too_short');
             return null;
           },
         ),
@@ -342,7 +343,7 @@ class _RegisterScreenState extends State<RegisterScreen>
               ),
               const SizedBox(width: 6),
               Text(
-                'Password strength: ${strength.label}',
+                '${context.tr('password_strength')}${context.tr(strength.label)}',
                 style: TextStyle(
                   color: strength.color,
                   fontSize: 11,
@@ -359,7 +360,7 @@ class _RegisterScreenState extends State<RegisterScreen>
   Widget _buildConfirmPasswordField() {
     return _buildInputField(
       controller: _confirmCtrl,
-      label: 'Confirm Password',
+      label: context.tr('confirm_password'),
       hint: '••••••••',
       icon: Icons.lock_outline_rounded,
       obscure: _obscureConfirm,
@@ -377,8 +378,8 @@ class _RegisterScreenState extends State<RegisterScreen>
             setState(() => _obscureConfirm = !_obscureConfirm),
       ),
       validator: (v) {
-        if (v == null || v.isEmpty) return 'Please confirm your password.';
-        if (v != _passwordCtrl.text) return 'Passwords do not match.';
+        if (v == null || v.isEmpty) return context.tr('confirm_password_required');
+        if (v != _passwordCtrl.text) return context.tr('passwords_dont_match');
         return null;
       },
     );
@@ -414,9 +415,9 @@ class _RegisterScreenState extends State<RegisterScreen>
                       color: Colors.white,
                     ),
                   )
-                : const Text(
-                    'Create Account',
-                    style: TextStyle(
+                : Text(
+                    context.tr('create_account'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -433,9 +434,9 @@ class _RegisterScreenState extends State<RegisterScreen>
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
-          'Already have an account?',
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+        Text(
+          context.tr('already_have_account'),
+          style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
         ),
         TextButton(
           onPressed: () => Navigator.pop(context),
@@ -444,9 +445,9 @@ class _RegisterScreenState extends State<RegisterScreen>
             minimumSize: Size.zero,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          child: const Text(
-            'Sign In',
-            style: TextStyle(
+          child: Text(
+            context.tr('sign_in'),
+            style: const TextStyle(
               color: AppColors.primary,
               fontSize: 14,
               fontWeight: FontWeight.w700,

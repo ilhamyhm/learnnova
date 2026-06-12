@@ -4,6 +4,7 @@ import '../../models/module_model.dart';
 import '../../services/module_state_service.dart';
 import '../home/category_detail_page.dart';
 import '../home/sub_detail_page.dart';
+import '../../services/app_localizations.dart';
 
 class ExplorerScreen extends StatefulWidget {
   const ExplorerScreen({super.key});
@@ -122,10 +123,13 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
             SliverToBoxAdapter(child: _buildFiltersSection()),
             
             if (!_isFiltering) ...[
+              SliverToBoxAdapter(
+                child: _buildSectionTitle('⭐ ${context.tr('featured_courses')}', context.tr('editors_picks')),
+              ),
               SliverToBoxAdapter(child: _buildFeaturedCourses()),
               SliverToBoxAdapter(child: _buildTrending()),
               SliverToBoxAdapter(
-                child: _buildSectionTitle('All Courses', '${_filteredModules.length} found'),
+                child: _buildSectionTitle(context.tr('all_courses'), '${_filteredModules.length} ${context.tr('found')}'),
               ),
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
@@ -142,7 +146,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
             ] else ...[
               // Active search/filter results view
               SliverToBoxAdapter(
-                child: _buildSectionTitle('Matching Topics', '${_filteredSubModules.length} found'),
+                child: _buildSectionTitle(context.tr('matching_topics'), '${_filteredSubModules.length} ${context.tr('found')}'),
               ),
               if (_filteredSubModules.isEmpty)
                 SliverToBoxAdapter(child: _buildEmptyState())
@@ -184,9 +188,9 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Explorer',
-                  style: TextStyle(
+                Text(
+                  context.tr('explorer_title'),
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 26,
                     fontWeight: FontWeight.w800,
@@ -198,9 +202,9 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                     color: AppColors.accent,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text(
-                    '🔥 Trending',
-                    style: TextStyle(
+                  child: Text(
+                    '🔥 ${context.tr('trending')}',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
@@ -210,9 +214,9 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
               ],
             ),
             const SizedBox(height: 6),
-            const Text(
-              'Discover your next learning adventure',
-              style: TextStyle(color: Colors.white70, fontSize: 13),
+            Text(
+              context.tr('discover_next_adventure'),
+              style: const TextStyle(color: Colors.white70, fontSize: 13),
             ),
           ],
         ),
@@ -241,7 +245,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
           onChanged: (v) => setState(() => _searchQuery = v),
           style: TextStyle(color: colors.textPrimary, fontSize: 14),
           decoration: InputDecoration(
-            hintText: 'Search courses, topics...',
+            hintText: context.tr('search_modules_topics'),
             hintStyle: TextStyle(color: colors.textHint),
             prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primary),
             suffixIcon: _searchQuery.isNotEmpty
@@ -267,11 +271,11 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Category filters
-        const Padding(
-          padding: EdgeInsets.fromLTRB(20, 16, 20, 8),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
           child: Text(
-            'CATEGORY',
-            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+            context.tr('category_filter').toUpperCase(),
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
           ),
         ),
         SizedBox(
@@ -300,7 +304,9 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                   ),
                   child: Center(
                     child: Text(
-                      cat,
+                      cat == 'All'
+                          ? context.tr('all')
+                          : context.tr('category_${cat.toLowerCase().replaceAll(' & ', '_').replaceAll(' ', '_')}'),
                       style: TextStyle(
                         color: isSelected ? Colors.white : colors.textSecondary,
                         fontSize: 12,
@@ -315,11 +321,11 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
         ),
 
         // Difficulty filters
-        const Padding(
-          padding: EdgeInsets.fromLTRB(20, 12, 20, 8),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
           child: Text(
-            'DIFFICULTY',
-            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+            context.tr('difficulty_filter').toUpperCase(),
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
           ),
         ),
         SizedBox(
@@ -348,7 +354,9 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                   ),
                   child: Center(
                     child: Text(
-                      diff,
+                      diff == 'All'
+                          ? context.tr('all')
+                          : context.tr(diff.toLowerCase()),
                       style: TextStyle(
                         color: isSelected ? Colors.white : colors.textSecondary,
                         fontSize: 12,
@@ -370,7 +378,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('⭐ Featured Courses', 'Editor\'s picks'),
+        // Title built in the CustomScrollView list directly now
         SizedBox(
           height: 180,
           child: ListView.builder(
@@ -437,7 +445,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    module.category,
+                                    context.tr('category_${module.category.toLowerCase().replaceAll(' & ', '_').replaceAll(' ', '_')}'),
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 10,
@@ -458,7 +466,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${module.subModules.length} topics • ⭐ 4.8',
+                              '${module.subModules.length} ${context.tr('topics_count').toLowerCase()} • ⭐ 4.8',
                               style: const TextStyle(color: Colors.white70, fontSize: 12),
                             ),
                             const SizedBox(height: 10),
@@ -490,7 +498,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('🔥 Trending Now', 'Most popular'),
+        _buildSectionTitle('🔥 ${context.tr('trending_now')}', context.tr('most_popular')),
         SizedBox(
           height: 110,
           child: ListView.builder(
@@ -529,7 +537,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            '🔥 Hot',
+                            '🔥 ${context.tr('hot')}',
                             style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: AppColors.accentDark),
                           ),
                         ),
@@ -547,7 +555,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      '${sub.totalLessons} lessons',
+                      '${sub.totalLessons} ${context.tr('lessons')}',
                       style: TextStyle(color: colors.textSecondary, fontSize: 10),
                     ),
                   ],
@@ -630,7 +638,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${module.subModules.length} topics • ${module.category}',
+                    '${module.subModules.length} ${context.tr('topics_count').toLowerCase()} • ${context.tr('category_${module.category.toLowerCase().replaceAll(' & ', '_').replaceAll(' ', '_')}')}',
                     style: TextStyle(color: colors.textSecondary, fontSize: 11),
                   ),
                   const SizedBox(height: 8),
@@ -682,20 +690,20 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
     final parentColor = Color(parent.colorValue);
 
     // Completion Status text and colors
-    String statusText = 'Not Started';
+    String statusText = context.tr('not_started');
     Color statusColor = colors.textHint;
     Color statusBg = colors.surface;
 
     if (sub.isCompleted) {
-      statusText = 'Completed';
+      statusText = context.tr('completed');
       statusColor = AppColors.success;
       statusBg = colors.successLight;
     } else if (sub.allMaterialsCompleted) {
-      statusText = 'Materials Completed';
+      statusText = context.tr('materials_completed');
       statusColor = AppColors.accent;
       statusBg = colors.accentLight;
     } else if (sub.progress > 0.0) {
-      statusText = 'In Progress';
+      statusText = context.tr('in_progress');
       statusColor = AppColors.primary;
       statusBg = colors.primarySurface;
     }
@@ -781,7 +789,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                   Row(
                     children: [
                       Text(
-                        'Course: ${parent.name}',
+                        '${context.tr('course')}: ${parent.name}',
                         style: TextStyle(color: colors.textSecondary, fontSize: 11),
                       ),
                       const SizedBox(width: 8),
@@ -798,7 +806,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                           border: Border.all(color: colors.divider, width: 0.5),
                         ),
                         child: Text(
-                          sub.difficulty,
+                          context.tr(sub.difficulty.toLowerCase()),
                           style: TextStyle(
                             color: sub.difficulty == 'Advanced'
                                 ? Colors.red.shade400
@@ -866,12 +874,12 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
             const Icon(Icons.search_off_rounded, size: 60, color: AppColors.textSecondary),
             const SizedBox(height: 16),
             Text(
-              'No topics match your filters',
+              context.tr('no_topics_match'),
               style: TextStyle(color: colors.textPrimary, fontSize: 16, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 6),
             Text(
-              'Try adjusting your search query, category, or difficulty level filters.',
+              context.tr('try_adjusting_filters'),
               style: TextStyle(color: colors.textSecondary, fontSize: 13),
               textAlign: TextAlign.center,
             ),

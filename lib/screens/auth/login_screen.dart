@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../constants/app_colors.dart';
 import '../../services/firebase_auth_service.dart';
+import '../../services/app_localizations.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
 
@@ -88,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen>
       _showError(FirebaseAuthService.friendlyError(e));
     } catch (_) {
       if (!mounted) return;
-      _showError('An unexpected error occurred. Please try again.');
+      _showError(context.tr('login_failed'));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -200,9 +201,9 @@ class _LoginScreenState extends State<LoginScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Welcome back! 👋',
-          style: TextStyle(
+        Text(
+          context.tr('welcome_back'),
+          style: const TextStyle(
             color: AppColors.textPrimary,
             fontSize: 22,
             fontWeight: FontWeight.w700,
@@ -210,8 +211,8 @@ class _LoginScreenState extends State<LoginScreen>
         ),
         const SizedBox(height: 4),
         Text(
-          'Sign in to continue your learning journey.',
-          style: TextStyle(
+          context.tr('sign_in_continue'),
+          style: const TextStyle(
             color: AppColors.textSecondary,
             fontSize: 14,
             height: 1.4,
@@ -227,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen>
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
-        labelText: 'Email Address',
+        labelText: context.tr('email_address'),
         hintText: 'you@example.com',
         prefixIcon: const Icon(Icons.email_outlined, color: AppColors.textSecondary),
         filled: true,
@@ -254,9 +255,9 @@ class _LoginScreenState extends State<LoginScreen>
         ),
       ),
       validator: (v) {
-        if (v == null || v.trim().isEmpty) return 'Please enter your email.';
+        if (v == null || v.trim().isEmpty) return context.tr('email_required');
         final emailRegex = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,}$');
-        if (!emailRegex.hasMatch(v.trim())) return 'Enter a valid email address.';
+        if (!emailRegex.hasMatch(v.trim())) return context.tr('email_invalid');
         return null;
       },
     );
@@ -269,7 +270,7 @@ class _LoginScreenState extends State<LoginScreen>
       textInputAction: TextInputAction.done,
       onFieldSubmitted: (_) => _login(),
       decoration: InputDecoration(
-        labelText: 'Password',
+        labelText: context.tr('password'),
         hintText: '••••••••',
         prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.textSecondary),
         suffixIcon: IconButton(
@@ -306,7 +307,7 @@ class _LoginScreenState extends State<LoginScreen>
         ),
       ),
       validator: (v) {
-        if (v == null || v.isEmpty) return 'Please enter your password.';
+        if (v == null || v.isEmpty) return context.tr('password_required');
         return null;
       },
     );
@@ -327,9 +328,9 @@ class _LoginScreenState extends State<LoginScreen>
           ),
         ),
         const SizedBox(width: 8),
-        const Text(
-          'Remember me',
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+        Text(
+          context.tr('remember_me'),
+          style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
         ),
         const Spacer(),
         TextButton(
@@ -342,9 +343,9 @@ class _LoginScreenState extends State<LoginScreen>
             minimumSize: Size.zero,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          child: const Text(
-            'Forgot Password?',
-            style: TextStyle(
+          child: Text(
+            context.tr('forgot_password'),
+            style: const TextStyle(
               color: AppColors.primary,
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -385,9 +386,9 @@ class _LoginScreenState extends State<LoginScreen>
                       color: Colors.white,
                     ),
                   )
-                : const Text(
-                    'Sign In',
-                    style: TextStyle(
+                : Text(
+                    context.tr('sign_in'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -407,7 +408,7 @@ class _LoginScreenState extends State<LoginScreen>
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
-            'or',
+            context.tr('or'),
             style: TextStyle(color: AppColors.textHint, fontSize: 13),
           ),
         ),
@@ -420,9 +421,9 @@ class _LoginScreenState extends State<LoginScreen>
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
-          "Don't have an account?",
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+        Text(
+          context.tr('dont_have_account'),
+          style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
         ),
         TextButton(
           onPressed: () => Navigator.push(
@@ -434,9 +435,9 @@ class _LoginScreenState extends State<LoginScreen>
             minimumSize: Size.zero,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          child: const Text(
-            'Sign Up',
-            style: TextStyle(
+          child: Text(
+            context.tr('sign_up'),
+            style: const TextStyle(
               color: AppColors.primary,
               fontSize: 14,
               fontWeight: FontWeight.w700,
