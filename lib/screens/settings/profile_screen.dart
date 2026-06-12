@@ -3,12 +3,43 @@ import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../services/firebase_auth_service.dart';
 import '../../services/module_state_service.dart';
+import '../../services/streak_service.dart';
+import 'edit_profile_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
-  /// Returns the current Firebase user, or null.
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  int _streak = 0;
+  bool _isLoading = true;
+
   User? get _user => FirebaseAuth.instance.currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStats();
+  }
+
+  Future<void> _loadStats() async {
+    setState(() => _isLoading = true);
+    try {
+      await ModuleStateService.instance.refreshAll();
+      final streak = await StreakService.instance.getStreak();
+      if (mounted) {
+        setState(() {
+          _streak = streak;
+          _isLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   Future<void> _logout(BuildContext context) async {
     final confirm = await showDialog<bool>(
@@ -33,34 +64,73 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
     if (confirm == true) {
-      // Pop back to the main scaffold first so AuthWrapper can take over
       if (context.mounted) Navigator.of(context).popUntil((r) => r.isFirst);
       await FirebaseAuthService().signOut();
-      // AuthWrapper stream will rebuild and show LoginScreen automatically
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final modules = ModuleStateService.instance.modules;
-    final completedModules = modules.expand((m) => m.subModules).where((s) => s.isCompleted).length;
-    final totalModules = modules.expand((m) => m.subModules).length;
+
+    // Completed SubModules (Topics) where isCompleted = true
+    final completedSubModules = modules.expand((m) => m.subModules).where((s) => s.isCompleted).length;
+    final totalSubModules = modules.expand((m) => m.subModules).length;
+
+    // Completed Modules (top-level modules) where all submodules are completed
+    final completedModules = modules.where((m) => m.allSubModulesCompleted).length;
+    final totalModules = modules.length;
+
+    // Completed lessons (materials) across all modules
+    final completedLessons = modules.expand((m) => m.subModules).map((s) => s.completedLessons).fold(0, (a, b) => a + b);
+    final totalLessons = modules.expand((m) => m.subModules).map((s) => s.totalLessons).fold(0, (a, b) => a + b);
+
+    // Quiz Stats
+    final quizSubmodules = modules.expand((m) => m.subModules).toList();
+    final attemptedQuizzes = quizSubmodules.where((s) => s.quizScore > 0.0).toList();
+    final avgQuizScore = attemptedQuizzes.isEmpty
+        ? 0.0
+        : attemptedQuizzes.map((s) => s.quizScore).reduce((a, b) => a + b) / attemptedQuizzes.length;
+    final passedQuizzes = quizSubmodules.where((s) => s.isQuizPassed).length;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          _buildAppBar(context),
-          SliverToBoxAdapter(child: _buildAvatarSection()),
-          SliverToBoxAdapter(child: _buildStatsSection(completedModules, totalModules)),
-          SliverToBoxAdapter(child: _buildInfoCard()),
-          SliverToBoxAdapter(child: _buildLevelCard()),
-          SliverToBoxAdapter(child: _buildRecentBadges()),
-          SliverToBoxAdapter(child: _buildActionButtons(context)),
-          const SliverToBoxAdapter(child: SizedBox(height: 40)),
-        ],
-      ),
+      backgroundColor: colors.background,
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+              ),
+            )
+          : RefreshIndicator(
+              onRefresh: _loadStats,
+              color: AppColors.primary,
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                slivers: [
+                  _buildAppBar(context),
+                  SliverToBoxAdapter(child: _buildAvatarSection()),
+                  SliverToBoxAdapter(
+                    child: _buildStatsSection(
+                      completedModules: completedModules,
+                      totalModules: totalModules,
+                      completedLessons: completedLessons,
+                      totalLessons: totalLessons,
+                      completedSubModules: completedSubModules,
+                      totalSubModules: totalSubModules,
+                      avgQuizScore: avgQuizScore,
+                      passedQuizzes: passedQuizzes,
+                    ),
+                  ),
+                  SliverToBoxAdapter(child: _buildInfoCard()),
+                  SliverToBoxAdapter(child: _buildLevelCard(completedSubModules, totalSubModules)),
+                  SliverToBoxAdapter(child: _buildActionButtons(context)),
+                  const SliverToBoxAdapter(child: SizedBox(height: 40)),
+                ],
+              ),
+            ),
     );
   }
 
@@ -80,20 +150,6 @@ class ProfileScreen extends StatelessWidget {
           child: const Icon(Icons.arrow_back_rounded, color: Colors.white),
         ),
       ),
-      actions: [
-        Container(
-          margin: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.share_rounded, color: Colors.white, size: 20),
-            onPressed: () {},
-            padding: EdgeInsets.zero,
-          ),
-        ),
-      ],
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
           decoration: const BoxDecoration(gradient: AppColors.heroGradient),
@@ -136,9 +192,6 @@ class ProfileScreen extends StatelessWidget {
                             width: 90,
                             height: 90,
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [AppColors.primary, AppColors.primaryDark],
-                              ),
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.white, width: 3),
                               boxShadow: [
@@ -149,8 +202,21 @@ class ProfileScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            child: const Center(
-                              child: Text('👤', style: TextStyle(fontSize: 44)),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(45),
+                              child: _user?.photoURL != null
+                                  ? Image.network(
+                                      _user!.photoURL!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => Image.asset(
+                                        'lib/logo/logo.jpeg',
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : Image.asset(
+                                      'lib/logo/logo.jpeg',
+                                      fit: BoxFit.cover,
+                                    ),
                             ),
                           ),
                           Positioned(
@@ -219,7 +285,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Intermediate Level • Joined Jan 2024',
+                  'Intermediate Level',
                   style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
                 ),
               ],
@@ -241,12 +307,22 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsSection(int completedModules, int totalModules) {
+  Widget _buildStatsSection({
+    required int completedModules,
+    required int totalModules,
+    required int completedLessons,
+    required int totalLessons,
+    required int completedSubModules,
+    required int totalSubModules,
+    required double avgQuizScore,
+    required int passedQuizzes,
+  }) {
+    final colors = context.colors;
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: colors.cardBg,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -256,15 +332,29 @@ class ProfileScreen extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         children: [
-          _profileStat('$totalModules', 'Enrolled', AppColors.primary),
-          _vertDiv(),
-          _profileStat('$completedModules', 'Completed', AppColors.success),
-          _vertDiv(),
-          _profileStat('3', 'Certificates', AppColors.accent),
-          _vertDiv(),
-          _profileStat('🔥 12', 'Day Streak', AppColors.error),
+          Row(
+            children: [
+              _profileStat('$completedModules/$totalModules', 'Modules', AppColors.primary),
+              _vertDiv(),
+              _profileStat('$completedLessons/$totalLessons', 'Lessons', AppColors.success),
+              _vertDiv(),
+              _profileStat('🔥 $_streak', 'Streak', AppColors.error),
+            ],
+          ),
+          const SizedBox(height: 16),
+          const Divider(height: 1, color: AppColors.divider),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              _profileStat('${avgQuizScore.toInt()}%', 'Avg Score', AppColors.accent),
+              _vertDiv(),
+              _profileStat('$passedQuizzes', 'Quizzes Passed', AppColors.moduleLanguage),
+              _vertDiv(),
+              _profileStat('$completedSubModules/$totalSubModules', 'Topics Done', AppColors.moduleCodeLab),
+            ],
+          ),
         ],
       ),
     );
@@ -278,11 +368,11 @@ class ProfileScreen extends StatelessWidget {
             value,
             style: TextStyle(
               color: color,
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 4),
           Text(
             label,
             style: const TextStyle(color: AppColors.textSecondary, fontSize: 10),
@@ -294,15 +384,16 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _vertDiv() {
-    return Container(width: 1, height: 40, color: AppColors.divider);
+    return Container(width: 1, height: 32, color: AppColors.divider);
   }
 
   Widget _buildInfoCard() {
+    final colors = context.colors;
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: colors.cardBg,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -370,7 +461,8 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLevelCard() {
+  Widget _buildLevelCard(int completed, int total) {
+    final double levelProgress = total == 0 ? 0.0 : completed / total;
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       padding: const EdgeInsets.all(20),
@@ -392,11 +484,11 @@ class ProfileScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Text('🏅', style: TextStyle(fontSize: 24)),
-              SizedBox(width: 8),
-              Text(
+              const Text('🏅', style: TextStyle(fontSize: 24)),
+              const SizedBox(width: 8),
+              const Text(
                 'Learning Level',
                 style: TextStyle(
                   color: Colors.white,
@@ -404,10 +496,10 @@ class ProfileScreen extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              Spacer(),
+              const Spacer(),
               Text(
-                'Level 7 of 10',
-                style: TextStyle(color: Colors.white70, fontSize: 12),
+                '${completed} / ${total} topics done',
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
               ),
             ],
           ),
@@ -415,85 +507,16 @@ class ProfileScreen extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
-              value: 0.70,
+              value: levelProgress,
               backgroundColor: Colors.white.withValues(alpha: 0.3),
               valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
               minHeight: 10,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            '70% to Level 8 — Keep it up! 🚀',
-            style: TextStyle(color: Colors.white70, fontSize: 12),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecentBadges() {
-    final badges = ['🔥', '⭐', '🏆', '💎'];
-    return Container(
-      margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.cardBg,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Earned Certificates & Badges',
-                style: TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              Text(
-                '3 earned',
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: badges.map((b) {
-              final earned = badges.indexOf(b) < 3;
-              return Container(
-                width: 54,
-                height: 54,
-                margin: const EdgeInsets.only(right: 10),
-                decoration: BoxDecoration(
-                  color: earned ? AppColors.accentLight : AppColors.surface,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: earned ? AppColors.accent.withValues(alpha: 0.4) : AppColors.divider,
-                    width: 1.5,
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    b,
-                    style: TextStyle(
-                      fontSize: 26,
-                      color: earned ? null : Colors.grey,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
+          Text(
+            '${(levelProgress * 100).toInt()}% of topics completed — Keep it up! 🚀',
+            style: const TextStyle(color: Colors.white70, fontSize: 12),
           ),
         ],
       ),
@@ -506,7 +529,15 @@ class ProfileScreen extends StatelessWidget {
       child: Column(
         children: [
           ElevatedButton.icon(
-            onPressed: () {},
+            onPressed: () async {
+              final updated = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+              );
+              if (updated == true) {
+                _loadStats();
+              }
+            },
             icon: const Icon(Icons.edit_rounded, size: 18),
             label: const Text('Edit Profile', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
             style: ElevatedButton.styleFrom(
