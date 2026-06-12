@@ -3,6 +3,7 @@ import '../../constants/app_colors.dart';
 import '../../models/module_model.dart';
 import '../../models/quiz_model.dart';
 import '../../services/api_service.dart';
+import '../../services/streak_service.dart';
 import '../../services/user_progress_service.dart';
 import 'quiz_result_screen.dart';
 
@@ -93,6 +94,8 @@ class _QuizScreenState extends State<QuizScreen> {
 
     // Save quiz result and update module progress
     await _progress.saveQuizResult(widget.module.apiKey, score, passed);
+    // Record streak activity for quiz submission
+    await StreakService.instance.recordActivity();
     if (passed) {
       for (final sub in widget.module.subModules) {
         sub.progress = 1.0;

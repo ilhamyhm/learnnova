@@ -304,6 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildStatsRow() {
+    final colors = context.colors;
     final totalCompleted = _modules
         .expand((m) => m.subModules)
         .where((s) => s.isCompleted)
@@ -319,71 +320,128 @@ class _HomeScreenState extends State<HomeScreen> {
                 .map((m) => m.overallProgress)
                 .reduce((a, b) => a + b) /
             _modules.length;
+    final progressPct = (overallProgress * 100).toInt();
 
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryDark],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: colors.cardBg,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.35),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
+            color: Colors.black.withValues(alpha: 0.07),
+            blurRadius: 18,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-              child: _statItem(
-                  '${(overallProgress * 100).toInt()}%', 'Overall')),
-          _divider(),
-          Expanded(
-              child: _statItem('$totalCompleted\n/ $totalSubModules', 'Done')),
-          _divider(),
-          Expanded(child: _statItem('$completedModules\n/ $totalModules', 'Modules')),
-          _divider(),
-          Expanded(child: _statItem('$_streak', 'Streak 🔥')),
+          _statRow(
+            context: context,
+            icon: Icons.donut_large_rounded,
+            iconColor: AppColors.primary,
+            label: 'Overall Progress',
+            value: '$progressPct%',
+            extra: _progressBar(progressPct / 100, AppColors.primary, colors),
+          ),
+          _statDivider(colors),
+          _statRow(
+            context: context,
+            icon: Icons.menu_book_rounded,
+            iconColor: AppColors.moduleLanguage,
+            label: 'Lessons Completed',
+            value: '$totalCompleted of $totalSubModules',
+          ),
+          _statDivider(colors),
+          _statRow(
+            context: context,
+            icon: Icons.layers_rounded,
+            iconColor: AppColors.accent,
+            label: 'Modules Completed',
+            value: '$completedModules of $totalModules',
+          ),
+          _statDivider(colors),
+          _statRow(
+            context: context,
+            icon: Icons.local_fire_department_rounded,
+            iconColor: const Color(0xFFFF6B35),
+            label: 'Learning Streak',
+            value: '$_streak ${_streak == 1 ? 'Day' : 'Days'}${_streak > 0 ? ' 🔥' : ''}',
+          ),
         ],
       ),
     );
   }
 
-  Widget _statItem(String value, String label) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
+  Widget _statRow({
+    required BuildContext context,
+    required IconData icon,
+    required Color iconColor,
+    required String label,
+    required String value,
+    Widget? extra,
+  }) {
+    final colors = context.colors;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: iconColor, size: 18),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: colors.textSecondary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              Text(
+                value,
+                style: TextStyle(
+                  color: colors.textPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
           ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 10,
-            fontWeight: FontWeight.w500,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
+          if (extra != null) ...[const SizedBox(height: 8), extra],
+        ],
+      ),
     );
   }
 
-  Widget _divider() => Container(
-        width: 1,
-        height: 36,
-        color: Colors.white.withValues(alpha: 0.2),
+  Widget _progressBar(double value, Color color, dynamic colors) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(6),
+      child: LinearProgressIndicator(
+        value: value,
+        minHeight: 5,
+        backgroundColor: colors.surface as Color,
+        valueColor: AlwaysStoppedAnimation<Color>(color),
+      ),
+    );
+  }
+
+  Widget _statDivider(dynamic colors) => Divider(
+        height: 1,
+        color: (colors.divider as Color).withValues(alpha: 0.6),
       );
 
   Widget _buildContinueLearning(BuildContext context) {
