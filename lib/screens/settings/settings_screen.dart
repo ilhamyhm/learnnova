@@ -60,7 +60,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Settings ⚙️',
+              'Settings',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 26,
@@ -108,12 +108,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 2),
               ),
-              child: const Center(
-                child: Text('👤', style: TextStyle(fontSize: 28)),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: _user?.photoURL != null
+                    ? Image.network(
+                        _user!.photoURL!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Image.asset(
+                          'lib/logo/logo.jpeg',
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Image.asset(
+                        'lib/logo/logo.jpeg',
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
             const SizedBox(width: 14),
@@ -525,8 +537,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
-            const Text('📚', style: TextStyle(fontSize: 28)),
-            const SizedBox(width: 8),
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.asset(
+                  'lib/logo/logo.jpeg',
+                  width: 32,
+                  height: 32,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
             Text('LearnNova', style: TextStyle(color: colors.textPrimary)),
           ],
         ),
