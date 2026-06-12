@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
+import '../../services/app_localizations.dart';
 
 class HelpSupportScreen extends StatefulWidget {
   const HelpSupportScreen({super.key});
@@ -13,7 +14,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen>
   final _formKey = GlobalKey<FormState>();
   final _subjectCtrl = TextEditingController();
   final _messageCtrl = TextEditingController();
-  String _selectedTopic = 'General';
+  String _selectedTopic = 'topic_general';
   bool _isSending = false;
 
   late AnimationController _animCtrl;
@@ -22,43 +23,36 @@ class _HelpSupportScreenState extends State<HelpSupportScreen>
   // Track which FAQ is open
   int? _openFaq;
 
-  final List<_Faq> _faqs = const [
-    _Faq(
-      q: 'How do I enroll in a course?',
-      a:
-          'Go to the Explorer tab, find a course you like, and tap "Enroll Now." Enrolled courses appear on your Home screen for easy access.',
-    ),
-    _Faq(
-      q: 'How does the streak system work?',
-      a:
-          'Complete at least one lesson per day to maintain your streak 🔥. Missing a day resets it to 0. You can protect your streak with a "Streak Shield" from the store.',
-    ),
-    _Faq(
-      q: 'Can I download content for offline access?',
-      a:
-          'Offline downloads are available for Pro subscribers. Tap the download icon on any lesson to save it for offline viewing.',
-    ),
-    _Faq(
-      q: 'How do I get a certificate?',
-      a:
-          'Complete all lessons and pass the final quiz (score ≥ 70%) in a course. Your certificate is instantly generated and available in your Profile.',
-    ),
-    _Faq(
-      q: 'How do I change my password?',
-      a:
-          'Go to Settings → Account → Change Password. You will receive a password reset link via email.',
-    ),
-    _Faq(
-      q: 'How do I cancel my subscription?',
-      a:
-          'Navigate to Settings → Account → Manage Subscription. You can cancel anytime; access continues until the end of the billing period.',
-    ),
-    _Faq(
-      q: 'My video is not loading, what should I do?',
-      a:
-          'Check your internet connection first. If the issue persists, try closing and reopening the app. You can also report the issue using the feedback form below.',
-    ),
-  ];
+  List<_Faq> get _faqs => [
+        _Faq(
+          q: context.tr('faq_q1'),
+          a: context.tr('faq_a1'),
+        ),
+        _Faq(
+          q: context.tr('faq_q2'),
+          a: context.tr('faq_a2'),
+        ),
+        _Faq(
+          q: context.tr('faq_q3'),
+          a: context.tr('faq_a3'),
+        ),
+        _Faq(
+          q: context.tr('faq_q4'),
+          a: context.tr('faq_a4'),
+        ),
+        _Faq(
+          q: context.tr('faq_q5'),
+          a: context.tr('faq_a5'),
+        ),
+        _Faq(
+          q: context.tr('faq_q6'),
+          a: context.tr('faq_a6'),
+        ),
+        _Faq(
+          q: context.tr('faq_q7'),
+          a: context.tr('faq_a7'),
+        ),
+      ];
 
   @override
   void initState() {
@@ -87,11 +81,11 @@ class _HelpSupportScreenState extends State<HelpSupportScreen>
     _messageCtrl.clear();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Row(
+        content: Row(
           children: [
-            Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
-            SizedBox(width: 8),
-            Text('Message sent! We\'ll reply within 24 hours.'),
+            const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Text(context.tr('message_sent')),
           ],
         ),
         backgroundColor: AppColors.success,
@@ -147,22 +141,22 @@ class _HelpSupportScreenState extends State<HelpSupportScreen>
               end: Alignment.bottomRight,
             ),
           ),
-          child: const Align(
+          child: Align(
             alignment: Alignment.bottomLeft,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Help & Support 🛟',
-                      style: TextStyle(
+                  Text('${context.tr('help_support')} 🛟',
+                      style: const TextStyle(
                           color: Colors.white,
                           fontSize: 26,
                           fontWeight: FontWeight.w800)),
-                  SizedBox(height: 4),
-                  Text('We\'re here to help you succeed',
-                      style: TextStyle(color: Colors.white70, fontSize: 13)),
+                  const SizedBox(height: 4),
+                  Text(context.tr('help_desc'),
+                      style: const TextStyle(color: Colors.white70, fontSize: 13)),
                 ],
               ),
             ),
@@ -174,10 +168,10 @@ class _HelpSupportScreenState extends State<HelpSupportScreen>
 
   Widget _buildQuickLinks() {
     final links = [
-      _QuickLink(emoji: '📖', label: 'Getting\nStarted', color: AppColors.primary),
-      _QuickLink(emoji: '🎬', label: 'Video\nTutorials', color: AppColors.accent),
-      _QuickLink(emoji: '💬', label: 'Live\nChat', color: AppColors.success),
-      _QuickLink(emoji: '📧', label: 'Email\nUs', color: AppColors.moduleCreative),
+      _QuickLink(emoji: '📖', label: context.tr('getting_started'), color: AppColors.primary),
+      _QuickLink(emoji: '🎬', label: context.tr('video_tutorials'), color: AppColors.accent),
+      _QuickLink(emoji: '💬', label: context.tr('live_chat'), color: AppColors.success),
+      _QuickLink(emoji: '📧', label: context.tr('email_us'), color: AppColors.moduleCreative),
     ];
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
@@ -222,11 +216,11 @@ class _HelpSupportScreenState extends State<HelpSupportScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(20, 28, 20, 12),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 28, 20, 12),
           child: Text(
-            'FREQUENTLY ASKED QUESTIONS',
-            style: TextStyle(
+            context.tr('faqs_title'),
+            style: const TextStyle(
               color: AppColors.textSecondary,
               fontSize: 11,
               fontWeight: FontWeight.w700,
@@ -343,16 +337,16 @@ class _HelpSupportScreenState extends State<HelpSupportScreen>
 
   Widget _buildContactForm() {
     final topics = [
-      'General', 'Technical Issue', 'Billing', 'Course Content', 'Account', 'Other'
+      'topic_general', 'topic_technical', 'topic_billing', 'topic_content', 'topic_account', 'topic_other'
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(20, 28, 20, 12),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 28, 20, 12),
           child: Text(
-            'SEND US A MESSAGE',
-            style: TextStyle(
+            context.tr('send_message_title'),
+            style: const TextStyle(
               color: AppColors.textSecondary,
               fontSize: 11,
               fontWeight: FontWeight.w700,
@@ -380,8 +374,8 @@ class _HelpSupportScreenState extends State<HelpSupportScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Topic chips
-                const Text('Topic',
-                    style: TextStyle(
+                Text(context.tr('topic'),
+                    style: const TextStyle(
                         color: AppColors.textSecondary, fontSize: 12)),
                 const SizedBox(height: 8),
                 Wrap(
@@ -403,7 +397,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen>
                           ),
                         ),
                         child: Text(
-                          t,
+                          context.tr(t),
                           style: TextStyle(
                             color: sel
                                 ? Colors.white
@@ -422,10 +416,10 @@ class _HelpSupportScreenState extends State<HelpSupportScreen>
                   style: const TextStyle(
                       color: AppColors.textPrimary, fontSize: 14),
                   validator: (v) => (v == null || v.isEmpty)
-                      ? 'Please enter a subject'
+                      ? context.tr('enter_subject')
                       : null,
                   decoration: InputDecoration(
-                    labelText: 'Subject',
+                    labelText: context.tr('subject'),
                     labelStyle: const TextStyle(
                         color: AppColors.textSecondary, fontSize: 13),
                     filled: true,
@@ -453,10 +447,10 @@ class _HelpSupportScreenState extends State<HelpSupportScreen>
                   style: const TextStyle(
                       color: AppColors.textPrimary, fontSize: 14),
                   validator: (v) => (v == null || v.length < 10)
-                      ? 'Please write at least 10 characters'
+                      ? context.tr('enter_message_min')
                       : null,
                   decoration: InputDecoration(
-                    labelText: 'Message',
+                    labelText: context.tr('message'),
                     alignLabelWithHint: true,
                     labelStyle: const TextStyle(
                         color: AppColors.textSecondary, fontSize: 13),
@@ -496,13 +490,13 @@ class _HelpSupportScreenState extends State<HelpSupportScreen>
                           child: CircularProgressIndicator(
                               color: Colors.white, strokeWidth: 2.5),
                         )
-                      : const Row(
+                      : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.send_rounded, size: 18),
-                            SizedBox(width: 8),
-                            Text('Send Message',
-                                style: TextStyle(
+                            const Icon(Icons.send_rounded, size: 18),
+                            const SizedBox(width: 8),
+                            Text(context.tr('send_message'),
+                                style: const TextStyle(
                                     fontSize: 15, fontWeight: FontWeight.w700)),
                           ],
                         ),
@@ -518,7 +512,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen>
   void _showComingSoon() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('🚧 Coming soon!'),
+        content: Text('🚧 ${context.tr('coming_soon')}'),
         backgroundColor: AppColors.primary,
         behavior: SnackBarBehavior.floating,
         shape:

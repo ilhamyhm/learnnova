@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
+import '../../services/app_localizations.dart';
 
 class PrivacySettingsScreen extends StatefulWidget {
   const PrivacySettingsScreen({super.key});
@@ -55,17 +56,17 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen>
           physics: const BouncingScrollPhysics(),
           slivers: [
             _buildAppBar(context),
-            SliverToBoxAdapter(child: _buildPrivacyBanner()),
+            SliverToBoxAdapter(child: _buildPrivacyBanner(context)),
             SliverToBoxAdapter(
                 child: _buildSection(
-                    '📊 Data & Analytics', _dataItems(), AppColors.moduleCodeLab)),
+                    '📊 ${context.tr('data_analytics')}', _dataItems(context), AppColors.moduleCodeLab)),
             SliverToBoxAdapter(
                 child: _buildSection(
-                    '👤 Profile Visibility', _visibilityItems(), AppColors.moduleCreative)),
+                    '👤 ${context.tr('profile_visibility')}', _visibilityItems(context), AppColors.moduleCreative)),
             SliverToBoxAdapter(
                 child: _buildSection(
-                    '🔐 Security', _securityItems(), AppColors.success)),
-            SliverToBoxAdapter(child: _buildDataActions()),
+                    '🔐 ${context.tr('security')}', _securityItems(context), AppColors.success)),
+            SliverToBoxAdapter(child: _buildDataActions(context)),
             const SliverToBoxAdapter(child: SizedBox(height: 80)),
           ],
         ),
@@ -92,8 +93,8 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen>
       actions: [
         TextButton(
           onPressed: _savePrivacy,
-          child: const Text('Save',
-              style: TextStyle(
+          child: Text(context.tr('save'),
+              style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
                   fontSize: 15)),
@@ -108,22 +109,22 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen>
               end: Alignment.bottomRight,
             ),
           ),
-          child: const Align(
+          child: Align(
             alignment: Alignment.bottomLeft,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Privacy Settings 🔒',
-                      style: TextStyle(
+                  Text('${context.tr('privacy_settings')} 🔒',
+                      style: const TextStyle(
                           color: Colors.white,
                           fontSize: 26,
                           fontWeight: FontWeight.w800)),
-                  SizedBox(height: 4),
-                  Text('You control your data',
-                      style: TextStyle(color: Colors.white70, fontSize: 13)),
+                  const SizedBox(height: 4),
+                  Text(context.tr('you_control_data'),
+                      style: const TextStyle(color: Colors.white70, fontSize: 13)),
                 ],
               ),
             ),
@@ -133,7 +134,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen>
     );
   }
 
-  Widget _buildPrivacyBanner() {
+  Widget _buildPrivacyBanner(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(16),
@@ -152,26 +153,26 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen>
           ),
         ],
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Text('🛡️', style: TextStyle(fontSize: 32)),
-          SizedBox(width: 12),
+          const Text('🛡️', style: TextStyle(fontSize: 32)),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Your Privacy Matters',
-                  style: TextStyle(
+                  context.tr('privacy_matters'),
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
-                  'We never sell your personal data. These settings control how your information is used within LearnNova.',
-                  style: TextStyle(
+                  context.tr('privacy_banner_desc'),
+                  style: const TextStyle(
                       color: Colors.white70, fontSize: 11, height: 1.4),
                 ),
               ],
@@ -231,74 +232,75 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen>
     );
   }
 
-  List<Widget> _dataItems() => [
+  List<Widget> _dataItems(BuildContext context) => [
         _privacyTile(
           emoji: '📈',
-          title: 'Analytics & Insights',
-          subtitle: 'Help improve the app with anonymised usage data',
+          title: context.tr('analytics_insights'),
+          subtitle: context.tr('analytics_desc'),
           value: _analyticsData,
           onChanged: (v) => setState(() => _analyticsData = v),
         ),
         _privacyTile(
           emoji: '🐞',
-          title: 'Crash Reports',
-          subtitle: 'Automatically send crash reports to fix bugs',
+          title: context.tr('crash_reports'),
+          subtitle: context.tr('crash_desc'),
           value: _crashReports,
           onChanged: (v) => setState(() => _crashReports = v),
         ),
         _privacyTile(
           emoji: '🎯',
-          title: 'Personalised Ads',
-          subtitle: 'Show relevant ads based on your learning',
+          title: context.tr('personalised_ads'),
+          subtitle: context.tr('ads_desc'),
           value: _personalisedAds,
           onChanged: (v) => setState(() => _personalisedAds = v),
         ),
         _privacyTile(
           emoji: '📊',
-          title: 'Usage Statistics',
-          subtitle: 'Track study time and session data',
+          title: context.tr('usage_statistics'),
+          subtitle: context.tr('usage_desc'),
           value: _usageStatistics,
           onChanged: (v) => setState(() => _usageStatistics = v),
         ),
       ];
 
-  List<Widget> _visibilityItems() => [
+  List<Widget> _visibilityItems(BuildContext context) => [
         _privacyTileWithDropdown(
+          context: context,
           emoji: '🌐',
-          title: 'Profile Visibility',
-          subtitle: 'Who can see your profile',
+          title: context.tr('profile_visibility'),
+          subtitle: context.tr('visibility_desc'),
           value: _profileVisibility,
           options: const ['Everyone', 'Friends', 'Only Me'],
           onChanged: (v) => setState(() => _profileVisibility = v!),
         ),
         _privacyTile(
           emoji: '📚',
-          title: 'Show Learning Progress',
-          subtitle: 'Display course completion on profile',
+          title: context.tr('show_progress'),
+          subtitle: context.tr('show_progress_desc'),
           value: _showProgress,
           onChanged: (v) => setState(() => _showProgress = v),
         ),
         _privacyTile(
           emoji: '🏅',
-          title: 'Show Badges & Achievements',
-          subtitle: 'Display earned badges publicly',
+          title: context.tr('show_badges'),
+          subtitle: context.tr('show_badges_desc'),
           value: _showBadges,
           onChanged: (v) => setState(() => _showBadges = v),
         ),
         _privacyTile(
           emoji: '🏆',
-          title: 'Appear in Leaderboard',
-          subtitle: 'Let others see your ranking',
+          title: context.tr('appear_leaderboard'),
+          subtitle: context.tr('leaderboard_desc'),
           value: _showInLeaderboard,
           onChanged: (v) => setState(() => _showInLeaderboard = v),
         ),
       ];
 
-  List<Widget> _securityItems() => [
+  List<Widget> _securityItems(BuildContext context) => [
         _privacyTile(
           emoji: '🔑',
-          title: 'Two-Factor Authentication',
-          subtitle: 'Extra security layer with SMS/email code',
+          title: context.tr('two_factor'),
+          subtitle: context.tr('two_factor_desc'),
           value: _twoFactorAuth,
           onChanged: (v) {
             setState(() => _twoFactorAuth = v);
@@ -307,15 +309,15 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen>
         ),
         _privacyTile(
           emoji: '🔔',
-          title: 'Login Alerts',
-          subtitle: 'Get notified of new sign-ins',
+          title: context.tr('login_alerts'),
+          subtitle: context.tr('login_alerts_desc'),
           value: _loginAlerts,
           onChanged: (v) => setState(() => _loginAlerts = v),
         ),
         _privacyTile(
           emoji: '📱',
-          title: 'Active Sessions',
-          subtitle: 'Manage where you\'re logged in',
+          title: context.tr('active_sessions'),
+          subtitle: context.tr('sessions_desc'),
           value: _sessionManagement,
           onChanged: (v) => setState(() => _sessionManagement = v),
         ),
@@ -359,6 +361,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen>
   }
 
   Widget _privacyTileWithDropdown({
+    required BuildContext context,
     required String emoji,
     required String title,
     required String subtitle,
@@ -395,24 +398,31 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen>
         style: const TextStyle(
             color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.w600),
         items: options
-            .map((o) => DropdownMenuItem(value: o, child: Text(o)))
+            .map((o) => DropdownMenuItem(
+                  value: o,
+                  child: Text(o == 'Everyone'
+                      ? context.tr('everyone')
+                      : o == 'Friends'
+                          ? context.tr('friends')
+                          : context.tr('only_me')),
+                ))
             .toList(),
         onChanged: onChanged,
       ),
     );
   }
 
-  Widget _buildDataActions() {
+  Widget _buildDataActions(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(bottom: 12),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
             child: Text(
-              'DATA ACTIONS',
-              style: TextStyle(
+              context.tr('data_actions').toUpperCase(),
+              style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
@@ -437,17 +447,17 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen>
                 _actionTile(
                   icon: Icons.download_rounded,
                   color: AppColors.primary,
-                  title: 'Download My Data',
-                  subtitle: 'Get a copy of all your data',
-                  onTap: () => _showComingSoon('Data export coming soon'),
+                  title: context.tr('download_data'),
+                  subtitle: context.tr('download_data_desc'),
+                  onTap: () => _showComingSoon(context.tr('data_export_coming')),
                 ),
                 const Divider(
                     height: 1, indent: 56, endIndent: 16, color: AppColors.divider),
                 _actionTile(
                   icon: Icons.cleaning_services_rounded,
                   color: AppColors.accent,
-                  title: 'Clear Activity History',
-                  subtitle: 'Delete browsing & search history',
+                  title: context.tr('clear_history'),
+                  subtitle: context.tr('clear_history_desc'),
                   onTap: () => _showClearDialog(),
                 ),
                 const Divider(
@@ -455,8 +465,8 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen>
                 _actionTile(
                   icon: Icons.delete_forever_rounded,
                   color: AppColors.error,
-                  title: 'Delete Account',
-                  subtitle: 'Permanently remove your account and data',
+                  title: context.tr('delete_account'),
+                  subtitle: context.tr('delete_account_desc'),
                   onTap: () => _showDeleteDialog(),
                   isDestructive: true,
                 ),
@@ -506,15 +516,15 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen>
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
+        title: Row(
           children: [
-            Text('🔑 ', style: TextStyle(fontSize: 22)),
-            Text('Enable 2FA'),
+            const Text('🔑 ', style: TextStyle(fontSize: 22)),
+            Text(context.tr('enable_2fa')),
           ],
         ),
-        content: const Text(
-          'Two-Factor Authentication adds an extra layer of security. You\'ll be prompted for a code when signing in on new devices.\n\nFull setup coming soon!',
-          style: TextStyle(color: AppColors.textSecondary, height: 1.5),
+        content: Text(
+          context.tr('two_factor_dialog_desc'),
+          style: const TextStyle(color: AppColors.textSecondary, height: 1.5),
         ),
         actions: [
           TextButton(
@@ -522,8 +532,8 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen>
               Navigator.pop(context);
               setState(() => _twoFactorAuth = false);
             },
-            child: const Text('Cancel',
-                style: TextStyle(color: AppColors.textSecondary)),
+            child: Text(context.tr('cancel'),
+                style: const TextStyle(color: AppColors.textSecondary)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -541,23 +551,23 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen>
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Clear Activity History?'),
-        content: const Text(
-          'This will delete your browsing and search history. This action cannot be undone.',
-          style: TextStyle(color: AppColors.textSecondary),
+        title: Text(context.tr('clear_history_confirm')),
+        content: Text(
+          context.tr('clear_history_warning'),
+          style: const TextStyle(color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel',
-                style: TextStyle(color: AppColors.textSecondary)),
+            child: Text(context.tr('cancel'),
+                style: const TextStyle(color: AppColors.textSecondary)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: const Text('Activity history cleared!'),
+                  content: Text(context.tr('history_cleared')),
                   backgroundColor: AppColors.success,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
@@ -565,8 +575,8 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen>
                 ),
               );
             },
-            child: const Text('Clear',
-                style: TextStyle(
+            child: Text(context.tr('clear'),
+                style: const TextStyle(
                     color: AppColors.error, fontWeight: FontWeight.w700)),
           ),
         ],
@@ -579,26 +589,26 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen>
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
+        title: Row(
           children: [
-            Text('⚠️ ', style: TextStyle(fontSize: 22)),
-            Text('Delete Account?'),
+            const Text('⚠️ ', style: TextStyle(fontSize: 22)),
+            Text(context.tr('delete_account_confirm')),
           ],
         ),
-        content: const Text(
-          'This is permanent. All your progress, certificates, and data will be deleted and CANNOT be recovered.',
-          style: TextStyle(color: AppColors.textSecondary, height: 1.5),
+        content: Text(
+          context.tr('delete_account_warning'),
+          style: const TextStyle(color: AppColors.textSecondary, height: 1.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel',
-                style: TextStyle(color: AppColors.textSecondary)),
+            child: Text(context.tr('cancel'),
+                style: const TextStyle(color: AppColors.textSecondary)),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              _showComingSoon('Account deletion coming soon');
+              _showComingSoon(context.tr('account_deletion_coming'));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.error,
@@ -606,8 +616,8 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen>
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
             ),
-            child: const Text('Delete',
-                style: TextStyle(fontWeight: FontWeight.w700)),
+            child: Text(context.tr('delete'),
+                style: const TextStyle(fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -629,11 +639,11 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen>
   void _savePrivacy() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Row(
+        content: Row(
           children: [
-            Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
-            SizedBox(width: 8),
-            Text('Privacy settings saved!'),
+            const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Text(context.tr('privacy_saved')),
           ],
         ),
         backgroundColor: AppColors.success,

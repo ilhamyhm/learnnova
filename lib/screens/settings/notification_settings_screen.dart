@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
+import '../../services/app_localizations.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
   const NotificationSettingsScreen({super.key});
@@ -77,11 +78,11 @@ class _NotificationSettingsScreenState
             _buildAppBar(context),
             SliverToBoxAdapter(child: _buildMasterToggle()),
             SliverToBoxAdapter(
-                child: _buildSection('🎓 Learning', _learningItems())),
+                child: _buildSection('🎓 ${context.tr('learning_section')}', _learningItems())),
             SliverToBoxAdapter(
-                child: _buildSection('🏆 Achievements & Social', _socialItems())),
+                child: _buildSection('🏆 ${context.tr('achievements_social_section')}', _socialItems())),
             SliverToBoxAdapter(
-                child: _buildSection('📧 Email Notifications', _emailItems())),
+                child: _buildSection('📧 ${context.tr('email_notif_section')}', _emailItems())),
             SliverToBoxAdapter(child: _buildReminderTime()),
             const SliverToBoxAdapter(child: SizedBox(height: 100)),
           ],
@@ -109,8 +110,8 @@ class _NotificationSettingsScreenState
       actions: [
         TextButton(
           onPressed: _saveSettings,
-          child: const Text('Save',
-              style: TextStyle(
+          child: Text(context.tr('save'),
+              style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
                   fontSize: 15)),
@@ -125,22 +126,22 @@ class _NotificationSettingsScreenState
               end: Alignment.bottomRight,
             ),
           ),
-          child: const Align(
+          child: Align(
             alignment: Alignment.bottomLeft,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Notifications 🔔',
-                      style: TextStyle(
+                  Text('${context.tr('notifications')} 🔔',
+                      style: const TextStyle(
                           color: Colors.white,
                           fontSize: 26,
                           fontWeight: FontWeight.w800)),
-                  SizedBox(height: 4),
-                  Text('Customize what you hear from us',
-                      style: TextStyle(color: Colors.white70, fontSize: 13)),
+                  const SizedBox(height: 4),
+                  Text(context.tr('customize_alerts'),
+                      style: const TextStyle(color: Colors.white70, fontSize: 13)),
                 ],
               ),
             ),
@@ -171,18 +172,18 @@ class _NotificationSettingsScreenState
       ),
       child: Row(
         children: [
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('All Notifications',
-                    style: TextStyle(
+                Text(context.tr('all_notifications'),
+                    style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w700)),
-                SizedBox(height: 4),
-                Text('Master switch for all alerts',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                const SizedBox(height: 4),
+                Text(context.tr('master_switch'),
+                    style: const TextStyle(color: Colors.white70, fontSize: 12)),
               ],
             ),
           ),
@@ -253,8 +254,8 @@ class _NotificationSettingsScreenState
   List<Widget> _learningItems() => [
         _notifTile(
           emoji: '⏰',
-          title: 'Daily Reminder',
-          subtitle: 'Remind me to study each day',
+          title: context.tr('daily_reminder'),
+          subtitle: context.tr('daily_reminder_desc'),
           value: _dailyReminder && _allNotifications,
           onChanged: _allNotifications
               ? (v) => setState(() => _dailyReminder = v)
@@ -262,8 +263,8 @@ class _NotificationSettingsScreenState
         ),
         _notifTile(
           emoji: '📚',
-          title: 'Course Updates',
-          subtitle: 'New lessons added to enrolled courses',
+          title: context.tr('course_updates'),
+          subtitle: context.tr('course_updates_desc'),
           value: _courseUpdates && _allNotifications,
           onChanged: _allNotifications
               ? (v) => setState(() => _courseUpdates = v)
@@ -271,8 +272,8 @@ class _NotificationSettingsScreenState
         ),
         _notifTile(
           emoji: '🔥',
-          title: 'Streak Alerts',
-          subtitle: "Don't break your learning streak!",
+          title: context.tr('streak_alerts'),
+          subtitle: context.tr('streak_alerts_desc'),
           value: _streakAlerts && _allNotifications,
           onChanged: _allNotifications
               ? (v) => setState(() => _streakAlerts = v)
@@ -280,8 +281,8 @@ class _NotificationSettingsScreenState
         ),
         _notifTile(
           emoji: '✨',
-          title: 'New Content',
-          subtitle: 'Fresh courses & modules',
+          title: context.tr('new_content'),
+          subtitle: context.tr('new_content_desc'),
           value: _newContent && _allNotifications,
           onChanged: _allNotifications
               ? (v) => setState(() => _newContent = v)
@@ -292,8 +293,8 @@ class _NotificationSettingsScreenState
   List<Widget> _socialItems() => [
         _notifTile(
           emoji: '🏅',
-          title: 'Achievements',
-          subtitle: 'When you earn badges or level up',
+          title: context.tr('achievements'),
+          subtitle: context.tr('achievements_desc'),
           value: _achievements && _allNotifications,
           onChanged: _allNotifications
               ? (v) => setState(() => _achievements = v)
@@ -301,8 +302,8 @@ class _NotificationSettingsScreenState
         ),
         _notifTile(
           emoji: '🏆',
-          title: 'Leaderboard',
-          subtitle: 'Ranking changes & milestones',
+          title: context.tr('leaderboard'),
+          subtitle: context.tr('notif_leaderboard_desc'),
           value: _leaderboard && _allNotifications,
           onChanged: _allNotifications
               ? (v) => setState(() => _leaderboard = v)
@@ -310,8 +311,8 @@ class _NotificationSettingsScreenState
         ),
         _notifTile(
           emoji: '👥',
-          title: 'Community Activity',
-          subtitle: 'Replies, likes & mentions',
+          title: context.tr('community_activity'),
+          subtitle: context.tr('community_desc'),
           value: _communityActivity && _allNotifications,
           onChanged: _allNotifications
               ? (v) => setState(() => _communityActivity = v)
@@ -322,8 +323,8 @@ class _NotificationSettingsScreenState
   List<Widget> _emailItems() => [
         _notifTile(
           emoji: '📊',
-          title: 'Weekly Digest',
-          subtitle: 'Your weekly learning summary',
+          title: context.tr('weekly_digest'),
+          subtitle: context.tr('weekly_digest_desc'),
           value: _weeklyDigest && _allNotifications,
           onChanged: _allNotifications
               ? (v) => setState(() => _weeklyDigest = v)
@@ -331,8 +332,8 @@ class _NotificationSettingsScreenState
         ),
         _notifTile(
           emoji: '🎁',
-          title: 'Promotions & Offers',
-          subtitle: 'Special deals and new features',
+          title: context.tr('promotions_offers'),
+          subtitle: context.tr('promotions_desc'),
           value: _promotionalEmails && _allNotifications,
           onChanged: _allNotifications
               ? (v) => setState(() => _promotionalEmails = v)
@@ -340,8 +341,8 @@ class _NotificationSettingsScreenState
         ),
         _notifTile(
           emoji: '🔒',
-          title: 'Security Alerts',
-          subtitle: 'Login attempts & account changes',
+          title: context.tr('security_alerts'),
+          subtitle: context.tr('security_desc'),
           value: _securityAlerts,
           onChanged: (v) => setState(() => _securityAlerts = v),
           canDisable: false,
@@ -390,7 +391,7 @@ class _NotificationSettingsScreenState
               activeTrackColor: AppColors.primaryLight,
             )
           : Tooltip(
-              message: 'Security alerts cannot be disabled',
+              message: context.tr('security_cannot_disable'),
               child: Switch.adaptive(
                 value: value,
                 onChanged: null,
@@ -412,11 +413,11 @@ class _NotificationSettingsScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(20, 8, 20, 8),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
             child: Text(
-              '⏰  Daily Reminder Time',
-              style: TextStyle(
+              '⏰  ${context.tr('daily_reminder_time')}',
+              style: const TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
@@ -482,11 +483,11 @@ class _NotificationSettingsScreenState
   void _saveSettings() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Row(
+        content: Row(
           children: [
-            Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
-            SizedBox(width: 8),
-            Text('Notification preferences saved!'),
+            const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Text(context.tr('notif_saved')),
           ],
         ),
         backgroundColor: AppColors.success,

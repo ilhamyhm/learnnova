@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
+import '../../services/app_localizations.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -56,11 +57,11 @@ class _EditProfileScreenState extends State<EditProfileScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Row(
+          content: Row(
             children: [
-              Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
-              SizedBox(width: 8),
-              Text('Profile updated successfully!'),
+              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+              const SizedBox(width: 8),
+              Text(context.tr('profile_updated')),
             ],
           ),
           backgroundColor: AppColors.success,
@@ -106,20 +107,20 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                     children: [
                       _buildAvatarPicker(),
                       const SizedBox(height: 28),
-                      _sectionLabel('Basic Information'),
+                      _sectionLabel(context.tr('basic_information')),
                       const SizedBox(height: 12),
                       _buildField(
                         controller: _nameCtrl,
-                        label: 'Full Name',
+                        label: context.tr('full_name'),
                         icon: Icons.person_rounded,
-                        hint: 'Your display name',
+                        hint: context.tr('your_full_name'),
                         validator: (v) =>
-                            (v == null || v.trim().isEmpty) ? 'Name is required' : null,
+                            (v == null || v.trim().isEmpty) ? context.tr('name_required') : null,
                       ),
                       const SizedBox(height: 12),
                       _buildField(
                         controller: _phoneCtrl,
-                        label: 'Phone Number',
+                        label: context.tr('phone_number'),
                         icon: Icons.phone_rounded,
                         hint: '+62 812 ...',
                         keyboardType: TextInputType.phone,
@@ -127,18 +128,18 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                       const SizedBox(height: 12),
                       _buildField(
                         controller: _locationCtrl,
-                        label: 'Location',
+                        label: context.tr('location'),
                         icon: Icons.location_on_rounded,
-                        hint: 'City, Country',
+                        hint: context.tr('city_country'),
                       ),
                       const SizedBox(height: 24),
-                      _sectionLabel('About You'),
+                      _sectionLabel(context.tr('about_you')),
                       const SizedBox(height: 12),
                       _buildField(
                         controller: _bioCtrl,
-                        label: 'Bio',
+                        label: context.tr('bio'),
                         icon: Icons.edit_note_rounded,
-                        hint: 'Tell us about yourself...',
+                        hint: context.tr('bio_hint'),
                         maxLines: 3,
                       ),
                       const SizedBox(height: 32),
@@ -174,9 +175,9 @@ class _EditProfileScreenState extends State<EditProfileScreen>
       actions: [
         TextButton(
           onPressed: _isSaving ? null : _save,
-          child: const Text(
-            'Save',
-            style: TextStyle(
+          child: Text(
+            context.tr('save'),
+            style: const TextStyle(
                 color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15),
           ),
         ),
@@ -184,22 +185,22 @@ class _EditProfileScreenState extends State<EditProfileScreen>
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
           decoration: const BoxDecoration(gradient: AppColors.heroGradient),
-          child: const Align(
+          child: Align(
             alignment: Alignment.bottomLeft,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Edit Profile ✏️',
-                      style: TextStyle(
+                  Text('${context.tr('edit_profile')} ✏️',
+                      style: const TextStyle(
                           color: Colors.white,
                           fontSize: 26,
                           fontWeight: FontWeight.w800)),
-                  SizedBox(height: 4),
-                  Text('Update your personal information',
-                      style: TextStyle(color: Colors.white70, fontSize: 13)),
+                  const SizedBox(height: 4),
+                  Text(context.tr('update_personal_info'),
+                      style: const TextStyle(color: Colors.white70, fontSize: 13)),
                 ],
               ),
             ),
@@ -241,7 +242,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text('🚧 Photo upload coming soon!'),
+                    content: Text(context.tr('photo_upload_coming')),
                     backgroundColor: AppColors.primary,
                     behavior: SnackBarBehavior.floating,
                     shape: RoundedRectangleBorder(
@@ -367,10 +368,10 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                 child: CircularProgressIndicator(
                     color: Colors.white, strokeWidth: 2.5),
               )
-            : const Text(
-                'Save Changes',
+            : Text(
+                context.tr('save_changes'),
                 style:
-                    TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
               ),
       ),
     );
