@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../constants/app_colors.dart';
+import '../../services/app_localizations.dart';
 import '../../models/material_model.dart';
 import '../../models/module_model.dart';
 import '../../services/api_service.dart';
@@ -64,7 +65,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = 'Failed to load materials. Please try again.';
+        _error = context.tr('failed_load_materials');
         _isLoading = false;
       });
     }
@@ -189,7 +190,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
-                '${_viewedIds.length}/${_data!.materials.length} viewed',
+                '${_viewedIds.length}/${_data!.materials.length} ${context.tr('viewed')}',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 11,
@@ -212,7 +213,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Loading materials...',
+            context.tr('loading_materials'),
             style:
                 TextStyle(color: context.colors.textSecondary, fontSize: 14),
           ),
@@ -240,7 +241,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
             ElevatedButton.icon(
               onPressed: _loadMaterials,
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Retry'),
+              label: Text(context.tr('retry')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
@@ -341,7 +342,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    'Slide ${_currentIndex + 1} of ${materials.length}',
+                    'Slide ${_currentIndex + 1} ${context.tr('of')} ${materials.length}',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 11,
@@ -386,15 +387,15 @@ class _MaterialScreenState extends State<MaterialScreen> {
                           color: colors.successLight,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.check_circle_rounded,
+                            const Icon(Icons.check_circle_rounded,
                                 color: AppColors.success, size: 12),
-                            SizedBox(width: 4),
+                            const SizedBox(width: 4),
                             Text(
-                              'Viewed',
-                              style: TextStyle(
+                              context.tr('viewed_cap'),
+                              style: const TextStyle(
                                   color: AppColors.success,
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700),
@@ -492,14 +493,14 @@ class _MaterialScreenState extends State<MaterialScreen> {
                   topRight: Radius.circular(10),
                 ),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.code_rounded,
+                  const Icon(Icons.code_rounded,
                       color: Color(0xFF89DCEB), size: 14),
-                  SizedBox(width: 6),
+                  const SizedBox(width: 6),
                   Text(
-                    'Example Code',
-                    style: TextStyle(
+                    context.tr('example_code'),
+                    style: const TextStyle(
                       color: Color(0xFF89DCEB),
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -513,7 +514,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
                 Clipboard.setData(ClipboardData(text: code));
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text('Code copied to clipboard!'),
+                    content: Text(context.tr('copied_clipboard')),
                     backgroundColor: color,
                     behavior: SnackBarBehavior.floating,
                     shape: RoundedRectangleBorder(
@@ -534,7 +535,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
                     Icon(Icons.copy_rounded, color: color, size: 12),
                     const SizedBox(width: 4),
                     Text(
-                      'Copy',
+                      context.tr('copy'),
                       style: TextStyle(
                         color: color,
                         fontSize: 11,
@@ -605,7 +606,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
               child: OutlinedButton.icon(
                 onPressed: _goPrev,
                 icon: const Icon(Icons.arrow_back_rounded, size: 18),
-                label: const Text('Previous'),
+                label: Text(context.tr('previous')),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: color,
                   side: BorderSide(color: color.withValues(alpha: 0.4)),
@@ -628,8 +629,8 @@ class _MaterialScreenState extends State<MaterialScreen> {
                                 Navigator.pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: const Text(
-                                        '🎉 All 16 materials completed! Quiz is now unlocked.'),
+                                    content: Text(
+                                        context.tr('materials_completed_msg')),
                                     backgroundColor: AppColors.success,
                                     behavior: SnackBarBehavior.floating,
                                     shape: RoundedRectangleBorder(
@@ -642,8 +643,8 @@ class _MaterialScreenState extends State<MaterialScreen> {
                               Navigator.pop(context);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: const Text(
-                                      '🎉 All 16 materials completed! Quiz is now unlocked.'),
+                                  content: Text(
+                                      context.tr('materials_completed_msg')),
                                   backgroundColor: AppColors.success,
                                   behavior: SnackBarBehavior.floating,
                                   shape: RoundedRectangleBorder(
@@ -654,7 +655,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
                           }
                         : null,
                     icon: const Icon(Icons.check_circle_rounded, size: 18),
-                    label: Text(allViewed ? 'Finish & Unlock Quiz' : 'View All Slides First'),
+                    label: Text(allViewed ? context.tr('finish_unlock_quiz') : context.tr('view_all_slides')),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: color,
                       foregroundColor: Colors.white,
@@ -668,7 +669,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
                 : ElevatedButton.icon(
                     onPressed: _goNext,
                     icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-                    label: const Text('Next'),
+                    label: Text(context.tr('next')),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: color,
                       foregroundColor: Colors.white,
@@ -750,7 +751,7 @@ class _CheckpointDialogState extends State<_CheckpointDialog> {
                 ),
                 const Spacer(),
                 Text(
-                  'After Slide ${widget.slideNumber}',
+                  context.tr('after_slide').replaceAll('{num}', widget.slideNumber.toString()),
                   style: TextStyle(
                     color: colors.textSecondary,
                     fontSize: 11,
@@ -850,7 +851,7 @@ class _CheckpointDialogState extends State<_CheckpointDialog> {
                     Row(
                       children: [
                         Text(
-                          isCorrect ? '🎉 Correct!' : '💡 Explanation',
+                          isCorrect ? context.tr('correct_feedback') : '💡 ${context.tr('explanation_label')}',
                           style: TextStyle(
                             color: isCorrect
                                 ? AppColors.success
@@ -884,7 +885,7 @@ class _CheckpointDialogState extends State<_CheckpointDialog> {
                     widget.onContinue();
                   },
                   icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-                  label: const Text('Continue Learning'),
+                  label: Text(context.tr('continue_learning')),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: widget.color,
                     foregroundColor: Colors.white,
@@ -899,7 +900,7 @@ class _CheckpointDialogState extends State<_CheckpointDialog> {
               const SizedBox(height: 8),
               Center(
                 child: Text(
-                  'Select an answer to continue',
+                  context.tr('select_answer_continue'),
                   style: TextStyle(
                     color: colors.textHint,
                     fontSize: 12,

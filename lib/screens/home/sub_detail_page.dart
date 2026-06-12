@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../models/module_model.dart';
 import '../../services/user_progress_service.dart';
+import '../../services/app_localizations.dart';
 import '../material/material_screen.dart';
 import '../quiz/quiz_screen.dart';
 
@@ -66,7 +67,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Learning Path',
+                    context.tr('learning_path'),
                     style: TextStyle(
                       color: colors.textPrimary,
                       fontSize: 20,
@@ -74,7 +75,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
                     ),
                   ),
                   Text(
-                    '${sub.completedLessons}/${sub.totalLessons} done',
+                    '${sub.completedLessons}/${sub.totalLessons} ${context.tr('done')}',
                     style: TextStyle(
                       color: color,
                       fontSize: 12,
@@ -200,7 +201,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
                                 color: Colors.white70, size: 13),
                             const SizedBox(width: 4),
                             Text(
-                              '${sub.totalLessons} lessons',
+                              '${sub.totalLessons} ${context.tr('lessons')}',
                               style: const TextStyle(
                                   color: Colors.white70, fontSize: 12),
                             ),
@@ -225,9 +226,9 @@ class _SubDetailPageState extends State<SubDetailPage> {
                 children: [
                   _heroChip('⭐ 4.9'),
                   const SizedBox(width: 8),
-                  _heroChip('🏆 Certificate'),
+                  _heroChip('🏆 ${context.tr('certificate')}'),
                   const SizedBox(width: 8),
-                  _heroChip('🔰 Beginner'),
+                  _heroChip('🔰 ${context.tr(sub.difficulty.toLowerCase())}'),
                 ],
               ),
             ],
@@ -276,7 +277,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Your Progress',
+                context.tr('your_progress'),
                 style: TextStyle(
                   color: colors.textPrimary,
                   fontSize: 15,
@@ -285,7 +286,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
               ),
               Text(
                 sub.progress == 0.0
-                    ? 'Not Started'
+                    ? context.tr('not_started')
                     : '${(sub.progress * 100).toInt()}%',
                 style: TextStyle(
                   color: sub.progress == 0.0 ? colors.textHint : color,
@@ -310,7 +311,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${sub.completedLessons} of ${sub.totalLessons} lessons completed',
+                '${sub.completedLessons} ${context.tr('of')} ${sub.totalLessons} ${context.tr('lessons')} ${context.tr('completed').toLowerCase()}',
                 style: TextStyle(color: colors.textSecondary, fontSize: 12),
               ),
               if (sub.isCompleted)
@@ -321,9 +322,9 @@ class _SubDetailPageState extends State<SubDetailPage> {
                     color: colors.successLight,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text(
-                    '🏆 Topic Completed!',
-                    style: TextStyle(
+                  child: Text(
+                    '🏆 ${context.tr('topic_completed')}',
+                    style: const TextStyle(
                         color: AppColors.success,
                         fontSize: 11,
                         fontWeight: FontWeight.w700),
@@ -337,9 +338,9 @@ class _SubDetailPageState extends State<SubDetailPage> {
                     color: colors.accentLight,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text(
-                    '📖 Materials Completed',
-                    style: TextStyle(
+                  child: Text(
+                    '📖 ${context.tr('materials_completed')}',
+                    style: const TextStyle(
                         color: AppColors.accent,
                         fontSize: 11,
                         fontWeight: FontWeight.w700),
@@ -404,7 +405,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Lesson $lessonNum',
+                  '${context.tr('lesson')} $lessonNum',
                   style: TextStyle(
                     color: isDone
                         ? colors.textSecondary
@@ -417,7 +418,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  isDone ? 'Completed ✓' : '~15 min',
+                  isDone ? '${context.tr('completed')} ✓' : '~15 ${context.tr('min')}',
                   style: TextStyle(
                     color:
                         isDone ? AppColors.success : colors.textHint,
@@ -480,7 +481,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
                   const Icon(Icons.emoji_events_rounded, color: AppColors.success, size: 20),
                   const SizedBox(width: 8),
                   Text(
-                    'Quiz Passed: ${(sub.quizScore * 100).toInt()}%',
+                    '${context.tr('quiz_passed_label')} ${(sub.quizScore * 100).toInt()}%',
                     style: const TextStyle(
                       color: AppColors.success,
                       fontSize: 14,
@@ -513,7 +514,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
                     size: 20,
                   ),
                   label: Text(
-                    allMaterialsDone ? 'Review Materials' : 'Start Learning',
+                    allMaterialsDone ? context.tr('review_materials') : context.tr('start_learning'),
                     style: const TextStyle(
                         fontSize: 14, fontWeight: FontWeight.w700),
                   ),
@@ -550,7 +551,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
                     size: 20,
                   ),
                   label: Text(
-                    quizPassed ? 'Retake Quiz' : 'Take Quiz',
+                    quizPassed ? context.tr('retake_quiz') : context.tr('take_quiz'),
                     style: const TextStyle(
                         fontSize: 14, fontWeight: FontWeight.w700),
                   ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../models/module_model.dart';
 import '../../services/module_state_service.dart';
+import '../../services/app_localizations.dart';
 import 'sub_detail_page.dart';
 
 /// Shows the list of submodules (topics) inside a module.
@@ -49,7 +50,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Topics',
+                    context.tr('topics_count'),
                     style: TextStyle(
                       color: colors.textPrimary,
                       fontSize: 20,
@@ -64,7 +65,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      '${widget.module.subModules.length} topics',
+                      '${widget.module.subModules.length} ${context.tr('topics_count').toLowerCase()}',
                       style: TextStyle(
                         color: color,
                         fontSize: 12,
@@ -223,14 +224,14 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
           Row(
             children: [
               _infoChip(
-                  '📚 ${widget.module.subModules.length}', 'Topics', color),
+                  '📚 ${widget.module.subModules.length}', context.tr('topics_count'), color),
               const SizedBox(width: 10),
               _infoChip(
                   '✅ ${widget.module.completedSubModules}',
-                  'Done',
+                  context.tr('done'),
                   AppColors.success),
               const SizedBox(width: 10),
-              _infoChip('⭐ 4.8', 'Rating', AppColors.accent),
+              _infoChip('⭐ 4.8', context.tr('rating'), AppColors.accent),
             ],
           ),
           const SizedBox(height: 16),
@@ -238,7 +239,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Overall Progress',
+                context.tr('overall_progress'),
                 style: TextStyle(
                   color: colors.textPrimary,
                   fontSize: 13,
@@ -378,9 +379,9 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                             color: colors.successLight,
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: const Text(
-                            '✓ Done',
-                            style: TextStyle(
+                          child: Text(
+                            '✓ ${context.tr('done')}',
+                            style: const TextStyle(
                               color: AppColors.success,
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
@@ -395,9 +396,9 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                             color: colors.accentLight,
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: const Text(
-                            'Materials Completed',
-                            style: TextStyle(
+                          child: Text(
+                            context.tr('materials_completed'),
+                            style: const TextStyle(
                               color: AppColors.accent,
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
@@ -408,7 +409,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${sub.totalLessons} lessons',
+                    '${sub.totalLessons} ${context.tr('lessons')}',
                     style: TextStyle(
                         color: colors.textSecondary, fontSize: 11),
                   ),

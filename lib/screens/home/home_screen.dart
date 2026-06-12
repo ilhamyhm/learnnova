@@ -4,6 +4,7 @@ import '../../constants/app_colors.dart';
 import '../../models/module_model.dart';
 import '../../services/module_state_service.dart';
 import '../../services/streak_service.dart';
+import '../../services/app_localizations.dart';
 import '../../widgets/category_item.dart';
 import '../home/category_detail_page.dart';
 import '../settings/profile_screen.dart';
@@ -86,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'All Modules',
+                      context.tr('all_modules'),
                       style: TextStyle(
                         color: colors.textPrimary,
                         fontSize: 20,
@@ -94,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Text(
-                      '${_modules.length} courses',
+                      '${_modules.length} ${context.tr('courses')}',
                       style: TextStyle(
                         color: colors.textSecondary,
                         fontSize: 13,
@@ -260,14 +261,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      const Text(
-                        'Good Morning! 👋',
-                        style: TextStyle(color: Colors.white70, fontSize: 13),
+                      Text(
+                        '${context.tr('welcome_greeting')} ${_user?.displayName ?? 'Learner'} 👋',
+                        style: const TextStyle(color: Colors.white70, fontSize: 13),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
-                        'Learn Smarter, Grow Faster',
-                        style: TextStyle(
+                      Text(
+                        context.tr('app_subtitle'),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -304,7 +305,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onChanged: (v) => setState(() => _searchQuery = v),
         style: TextStyle(color: colors.textPrimary, fontSize: 14),
         decoration: InputDecoration(
-          hintText: 'Search modules, courses...',
+          hintText: context.tr('search_modules_topics'),
           hintStyle: TextStyle(color: colors.textHint, fontSize: 14),
           prefixIcon: const Icon(Icons.search_rounded,
               color: AppColors.primary, size: 22),
@@ -365,7 +366,7 @@ class _HomeScreenState extends State<HomeScreen> {
             context: context,
             icon: Icons.donut_large_rounded,
             iconColor: AppColors.primary,
-            label: 'Overall Progress',
+            label: context.tr('overall_progress'),
             value: '$progressPct%',
             extra: _progressBar(progressPct / 100, AppColors.primary, colors),
           ),
@@ -374,24 +375,24 @@ class _HomeScreenState extends State<HomeScreen> {
             context: context,
             icon: Icons.menu_book_rounded,
             iconColor: AppColors.moduleLanguage,
-            label: 'Lessons Completed',
-            value: '$totalCompleted of $totalSubModules',
+            label: context.tr('lessons_completed'),
+            value: '$totalCompleted ${context.tr('of')} $totalSubModules',
           ),
           _statDivider(colors),
           _statRow(
             context: context,
             icon: Icons.layers_rounded,
             iconColor: AppColors.accent,
-            label: 'Modules Completed',
-            value: '$completedModules of $totalModules',
+            label: context.tr('modules_completed'),
+            value: '$completedModules ${context.tr('of')} $totalModules',
           ),
           _statDivider(colors),
           _statRow(
             context: context,
             icon: Icons.local_fire_department_rounded,
             iconColor: const Color(0xFFFF6B35),
-            label: 'Learning Streak',
-            value: '$_streak ${_streak == 1 ? 'Day' : 'Days'}${_streak > 0 ? ' 🔥' : ''}',
+            label: context.tr('learning_streak'),
+            value: '$_streak ${context.tr(_streak == 1 ? 'day' : 'days')}${_streak > 0 ? ' 🔥' : ''}',
           ),
         ],
       ),
@@ -475,7 +476,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 24, 20, 14),
           child: Text(
-            'Continue Learning 🔥',
+            context.tr('continue_learning'),
             style: TextStyle(
               color: colors.textPrimary,
               fontSize: 20,
@@ -564,7 +565,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '${(module.overallProgress * 100).toInt()}% done',
+                            '${(module.overallProgress * 100).toInt()}% ${context.tr('done')}',
                             style: TextStyle(
                               color: color,
                               fontSize: 11,
