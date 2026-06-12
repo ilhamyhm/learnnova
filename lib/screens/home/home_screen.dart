@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../models/module_model.dart';
@@ -18,6 +19,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   int _streak = 0;
+
+  User? get _user => FirebaseAuth.instance.currentUser;
 
   List<Module> get _modules => ModuleStateService.instance.modules;
 
@@ -174,13 +177,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                 width: 36,
                                 height: 36,
                                 decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [AppColors.primary, AppColors.accent],
-                                  ),
                                   borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.1),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
-                                child: const Center(
-                                  child: Text('📚', style: TextStyle(fontSize: 18)),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.asset(
+                                    'lib/logo/logo.jpeg',
+                                    width: 36,
+                                    height: 36,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -207,14 +220,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                   width: 44,
                                   height: 44,
                                   decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [AppColors.primary, AppColors.primaryDark],
-                                    ),
                                     shape: BoxShape.circle,
                                     border: Border.all(color: Colors.white, width: 2),
                                   ),
-                                  child: const Center(
-                                    child: Text('👤', style: TextStyle(fontSize: 20)),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(22),
+                                    child: _user?.photoURL != null
+                                        ? Image.network(
+                                            _user!.photoURL!,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, __, ___) => Image.asset(
+                                              'lib/logo/logo.jpeg',
+                                              fit: BoxFit.cover,
+                                            ),
+                                          )
+                                        : Image.asset(
+                                            'lib/logo/logo.jpeg',
+                                            fit: BoxFit.cover,
+                                          ),
                                   ),
                                 ),
                                 Positioned(
