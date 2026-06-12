@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../models/module_model.dart';
-import '../../services/api_service.dart';
+import '../../services/user_progress_service.dart';
 import '../material/material_screen.dart';
 import '../quiz/quiz_screen.dart';
 
@@ -22,7 +22,7 @@ class SubDetailPage extends StatefulWidget {
 }
 
 class _SubDetailPageState extends State<SubDetailPage> {
-  final ApiService _api = ApiService();
+  final _progress = UserProgressService.instance;
 
   @override
   void initState() {
@@ -31,15 +31,16 @@ class _SubDetailPageState extends State<SubDetailPage> {
   }
 
   Future<void> _loadProgress() async {
-    final progress = await _api.getMaterialProgress(widget.subModule.apiKey);
-    final passed = await _api.isQuizPassed(widget.subModule.apiKey);
-    final score = await _api.getQuizScore(widget.subModule.apiKey) ?? 0.0;
+    final progress = await _progress.getMaterialProgress(widget.subModule.apiKey);
+    final passed = await _progress.isQuizPassed(widget.subModule.apiKey);
+    final score = await _progress.getQuizScore(widget.subModule.apiKey) ?? 0.0;
     if (mounted) {
       setState(() {
         widget.subModule.progress = progress;
         widget.subModule.isQuizPassed = passed;
         widget.subModule.quizScore = score;
-        widget.subModule.isCompleted = widget.subModule.allMaterialsCompleted && widget.subModule.isQuizPassed;
+        widget.subModule.isCompleted =
+            widget.subModule.allMaterialsCompleted && widget.subModule.isQuizPassed;
       });
     }
   }
@@ -312,7 +313,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
                 '${sub.completedLessons} of ${sub.totalLessons} lessons completed',
                 style: TextStyle(color: colors.textSecondary, fontSize: 12),
               ),
-              if (sub.isQuizPassed)
+              if (sub.isCompleted)
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -324,6 +325,22 @@ class _SubDetailPageState extends State<SubDetailPage> {
                     '🏆 Topic Completed!',
                     style: TextStyle(
                         color: AppColors.success,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700),
+                  ),
+                )
+              else if (sub.allMaterialsCompleted)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: colors.accentLight,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    '📖 Materials Completed',
+                    style: TextStyle(
+                        color: AppColors.accent,
                         fontSize: 11,
                         fontWeight: FontWeight.w700),
                   ),
