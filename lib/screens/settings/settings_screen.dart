@@ -26,17 +26,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Use adaptive colors throughout — this is the key fix for dark mode
+    final colors = context.colors;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
           _buildHeader(context),
           SliverToBoxAdapter(child: _buildProfileTile(context)),
-          SliverToBoxAdapter(child: _buildSection('Account', _accountItems(context))),
-          SliverToBoxAdapter(child: _buildSection('Preferences', _preferenceItems(context))),
-          SliverToBoxAdapter(child: _buildSection('Support', _supportItems(context))),
-          SliverToBoxAdapter(child: _buildSection('About', _aboutItems())),
+          SliverToBoxAdapter(child: _buildSection(context, 'Account', _accountItems(context))),
+          SliverToBoxAdapter(child: _buildSection(context, 'Preferences', _preferenceItems(context))),
+          SliverToBoxAdapter(child: _buildSection(context, 'Support', _supportItems(context))),
+          SliverToBoxAdapter(child: _buildSection(context, 'About', _aboutItems(context))),
           SliverToBoxAdapter(child: _buildLogout(context)),
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
@@ -164,17 +166,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildSection(String title, List<Widget> items) {
+  Widget _buildSection(BuildContext context, String title, List<Widget> items) {
+    final colors = context.colors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
           child: Text(
-            title,
-            style: const TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 12,
+            title.toUpperCase(),
+            style: TextStyle(
+              color: colors.textSecondary,
+              fontSize: 11,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.8,
             ),
@@ -183,7 +186,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
-            color: AppColors.cardBg,
+            color: colors.cardBg,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
@@ -201,11 +204,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   item,
                   if (index < items.length - 1)
-                    const Divider(
+                    Divider(
                       height: 1,
                       indent: 56,
                       endIndent: 16,
-                      color: AppColors.divider,
+                      color: colors.divider,
                     ),
                 ],
               );
@@ -219,6 +222,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   List<Widget> _accountItems(BuildContext context) => [
     _settingsTile(
+      context: context,
       icon: Icons.person_rounded,
       iconColor: AppColors.primary,
       title: 'Edit Profile',
@@ -229,6 +233,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     ),
     _settingsTile(
+      context: context,
       icon: Icons.lock_rounded,
       iconColor: AppColors.moduleCodeLab,
       title: 'Change Password',
@@ -239,6 +244,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     ),
     _settingsTile(
+      context: context,
       icon: Icons.email_rounded,
       iconColor: AppColors.moduleCreative,
       title: 'Email Address',
@@ -249,6 +255,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   List<Widget> _preferenceItems(BuildContext context) => [
     _settingsTileWithToggle(
+      context: context,
       icon: Icons.notifications_rounded,
       iconColor: AppColors.accent,
       title: 'Notifications',
@@ -263,8 +270,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       },
     ),
     _settingsTileWithToggle(
+      context: context,
       icon: Icons.dark_mode_rounded,
-      iconColor: AppColors.textPrimary,
+      iconColor: AppColors.primary,
       title: 'Dark Mode',
       subtitle: 'Toggle dark appearance',
       value: _darkModeEnabled,
@@ -274,6 +282,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       },
     ),
     _settingsTileWithDropdown(
+      context: context,
       icon: Icons.language_rounded,
       iconColor: AppColors.moduleLanguage,
       title: 'Language',
@@ -282,6 +291,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       onChanged: (v) => setState(() => _selectedLanguage = v!),
     ),
     _settingsTile(
+      context: context,
       icon: Icons.privacy_tip_rounded,
       iconColor: AppColors.moduleAnimation,
       title: 'Privacy Settings',
@@ -295,6 +305,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   List<Widget> _supportItems(BuildContext context) => [
     _settingsTile(
+      context: context,
       icon: Icons.help_rounded,
       iconColor: AppColors.primary,
       title: 'Help & Support',
@@ -305,6 +316,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     ),
     _settingsTile(
+      context: context,
       icon: Icons.feedback_rounded,
       iconColor: AppColors.moduleAcademy,
       title: 'Send Feedback',
@@ -316,8 +328,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ),
   ];
 
-  List<Widget> _aboutItems() => [
+  List<Widget> _aboutItems(BuildContext context) => [
     _settingsTile(
+      context: context,
       icon: Icons.info_rounded,
       iconColor: AppColors.moduleCodeLab,
       title: 'About LearnNova',
@@ -325,6 +338,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       onTap: () => _showAboutDialog(context),
     ),
     _settingsTile(
+      context: context,
       icon: Icons.star_rounded,
       iconColor: AppColors.accent,
       title: 'Rate Us',
@@ -334,12 +348,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   ];
 
   Widget _settingsTile({
+    required BuildContext context,
     required IconData icon,
     required Color iconColor,
     required String title,
     required String subtitle,
     VoidCallback? onTap,
   }) {
+    final colors = context.colors;
     return ListTile(
       onTap: onTap,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -354,21 +370,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       title: Text(
         title,
-        style: const TextStyle(
-          color: AppColors.textPrimary,
+        style: TextStyle(
+          color: colors.textPrimary,
           fontSize: 14,
           fontWeight: FontWeight.w600,
         ),
       ),
       subtitle: Text(
         subtitle,
-        style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+        style: TextStyle(color: colors.textSecondary, fontSize: 11),
       ),
-      trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.textHint, size: 20),
+      trailing: Icon(Icons.chevron_right_rounded, color: colors.textHint, size: 20),
     );
   }
 
   Widget _settingsTileWithToggle({
+    required BuildContext context,
     required IconData icon,
     required Color iconColor,
     required String title,
@@ -376,6 +393,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
+    final colors = context.colors;
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       leading: Container(
@@ -389,15 +407,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       title: Text(
         title,
-        style: const TextStyle(
-          color: AppColors.textPrimary,
+        style: TextStyle(
+          color: colors.textPrimary,
           fontSize: 14,
           fontWeight: FontWeight.w600,
         ),
       ),
       subtitle: Text(
         subtitle,
-        style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+        style: TextStyle(color: colors.textSecondary, fontSize: 11),
       ),
       trailing: Switch.adaptive(
         value: value,
@@ -409,6 +427,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _settingsTileWithDropdown({
+    required BuildContext context,
     required IconData icon,
     required Color iconColor,
     required String title,
@@ -416,6 +435,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required List<String> options,
     required ValueChanged<String?> onChanged,
   }) {
+    final colors = context.colors;
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       leading: Container(
@@ -429,8 +449,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       title: Text(
         title,
-        style: const TextStyle(
-          color: AppColors.textPrimary,
+        style: TextStyle(
+          color: colors.textPrimary,
           fontSize: 14,
           fontWeight: FontWeight.w600,
         ),
@@ -438,6 +458,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       trailing: DropdownButton<String>(
         value: value,
         underline: const SizedBox(),
+        dropdownColor: colors.cardBg,
         style: const TextStyle(
           color: AppColors.primary,
           fontSize: 13,
@@ -452,6 +473,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildLogout(BuildContext context) {
+    final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
       child: GestureDetector(
@@ -459,7 +481,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: AppColors.errorLight,
+            color: colors.errorLight,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: AppColors.error.withValues(alpha: 0.3), width: 1.5),
           ),
@@ -495,20 +517,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showAboutDialog(BuildContext context) {
+    final colors = context.colors;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
+        backgroundColor: colors.cardBg,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
+        title: Row(
           children: [
-            Text('📚', style: TextStyle(fontSize: 28)),
-            SizedBox(width: 8),
-            Text('LearnNova'),
+            const Text('📚', style: TextStyle(fontSize: 28)),
+            const SizedBox(width: 8),
+            Text('LearnNova', style: TextStyle(color: colors.textPrimary)),
           ],
         ),
-        content: const Text(
+        content: Text(
           'LearnNova v1.0.0\n\nLearn Smarter, Grow Faster.\n\nA modern educational platform designed to make learning engaging, effective, and fun.',
-          style: TextStyle(color: AppColors.textSecondary, height: 1.5),
+          style: TextStyle(color: colors.textSecondary, height: 1.5),
         ),
         actions: [
           TextButton(
@@ -521,27 +545,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showLogoutDialog(BuildContext context) {
+    final colors = context.colors;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
+        backgroundColor: colors.cardBg,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Log Out?'),
-        content: const Text(
+        title: Text('Log Out?', style: TextStyle(color: colors.textPrimary)),
+        content: Text(
           'Are you sure you want to log out of LearnNova?',
-          style: TextStyle(color: AppColors.textSecondary),
+          style: TextStyle(color: colors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
+            child: Text('Cancel', style: TextStyle(color: colors.textSecondary)),
           ),
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
               // Only sign out — AuthWrapper's stream listener will
               // automatically rebuild and show the LoginScreen.
-              // Do NOT navigate manually here; that causes a race condition
-              // that breaks subsequent logins.
               await FirebaseAuthService().signOut();
             },
             child: const Text('Log Out', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w700)),
