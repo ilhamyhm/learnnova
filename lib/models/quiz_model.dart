@@ -1,23 +1,28 @@
-/// Represents a single quiz question with four options and one correct answer.
+/// Represents a single quiz question with four options, one correct answer, and an explanation.
 class QuizQuestion {
   final int questionId;
   final String question;
   final List<String> options;
   final String correctAnswer;
+  final String explanation;
 
   const QuizQuestion({
     required this.questionId,
     required this.question,
     required this.options,
     required this.correctAnswer,
+    required this.explanation,
   });
 
   factory QuizQuestion.fromJson(Map<String, dynamic> json) {
+    final correctAns = json['correct_answer'] as String;
     return QuizQuestion(
       questionId: json['question_id'] as int,
       question: json['question'] as String,
       options: List<String>.from(json['options'] as List),
-      correctAnswer: json['correct_answer'] as String,
+      correctAnswer: correctAns,
+      explanation: json['explanation'] as String? ??
+          'The correct answer is "$correctAns". Understanding this concept is key to mastering the topic.',
     );
   }
 }
@@ -45,18 +50,22 @@ class ModuleQuizResponse {
   }
 }
 
-/// Stores the result of a completed quiz attempt.
+/// Stores the result of a completed quiz attempt, including answers for review.
 class QuizResult {
   final int moduleId;
   final String quizTitle;
   final int totalQuestions;
   final int correctAnswers;
+  final List<QuizQuestion> questions;
+  final Map<int, String> userAnswers; // maps question index to user's selected option
 
   const QuizResult({
     required this.moduleId,
     required this.quizTitle,
     required this.totalQuestions,
     required this.correctAnswers,
+    required this.questions,
+    required this.userAnswers,
   });
 
   double get scorePercent =>
@@ -64,3 +73,4 @@ class QuizResult {
 
   bool get isPassed => scorePercent >= 60;
 }
+
