@@ -3,6 +3,7 @@ import '../../constants/app_colors.dart';
 import '../../models/module_model.dart';
 import '../../services/module_state_service.dart';
 import '../home/category_detail_page.dart';
+import '../home/sub_detail_page.dart';
 
 class ExplorerScreen extends StatefulWidget {
   const ExplorerScreen({super.key});
@@ -15,11 +16,28 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   String _selectedCategory = 'All';
+  String _selectedDifficulty = 'All';
 
   final List<String> _categories = [
     'All', 'Programming', 'Design', 'Animation', 'Business', 'Languages', 'Academic', 'Creative', 'Sports & Fitness',
   ];
 
+  final List<String> _difficulties = [
+    'All', 'Beginner', 'Intermediate', 'Advanced',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProgress();
+  }
+
+  Future<void> _loadProgress() async {
+    await ModuleStateService.instance.refreshAll();
+    if (mounted) setState(() {});
+  }
+
+  // Returns matching modules
   List<Module> get _filteredModules {
     final modules = ModuleStateService.instance.modules;
     return modules.where((m) {
@@ -29,8 +47,45 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
             (s) => s.name.toLowerCase().contains(_searchQuery.toLowerCase()),
           );
       final matchesCategory = _selectedCategory == 'All' || m.category == _selectedCategory;
-      return matchesSearch && matchesCategory;
+      // Difficulty filter is mostly for topics, but if it is selected,
+      // we check if the module contains any submodules matching the difficulty.
+      final matchesDifficulty = _selectedDifficulty == 'All' ||
+          m.subModules.any((s) => s.difficulty.toLowerCase() == _selectedDifficulty.toLowerCase());
+
+      return matchesSearch && matchesCategory && matchesDifficulty;
     }).toList();
+  }
+
+  // Returns matching topics (submodules) grouped with their parent module color
+  List<({SubModule sub, Module parent})> get _filteredSubModules {
+    final modules = ModuleStateService.instance.modules;
+    final List<({SubModule sub, Module parent})> results = [];
+
+    for (final m in modules) {
+      // Category filter
+      if (_selectedCategory != 'All' && m.category != _selectedCategory) {
+        continue;
+      }
+
+      for (final s in m.subModules) {
+        // Difficulty filter
+        if (_selectedDifficulty != 'All' &&
+            s.difficulty.toLowerCase() != _selectedDifficulty.toLowerCase()) {
+          continue;
+        }
+
+        // Search query filter
+        final matchesSearch = _searchQuery.isEmpty ||
+            s.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+            s.description.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+            m.name.toLowerCase().contains(_searchQuery.toLowerCase());
+
+        if (matchesSearch) {
+          results.add((sub: s, parent: m));
+        }
+      }
+    }
+    return results;
   }
 
   List<SubModule> get _trendingSubModules {
@@ -39,6 +94,9 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
         .take(5)
         .toList();
   }
+
+  bool get _isFiltering =>
+      _searchQuery.isNotEmpty || _selectedCategory != 'All' || _selectedDifficulty != 'All';
 
   @override
   void dispose() {
@@ -51,28 +109,59 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
     final colors = context.colors;
     return Scaffold(
       backgroundColor: colors.background,
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          _buildHeader(),
-          SliverToBoxAdapter(child: _buildSearchBar()),
-          SliverToBoxAdapter(child: _buildFeaturedCourses()),
-          SliverToBoxAdapter(child: _buildCategoryFilter()),
-          if (_searchQuery.isEmpty) SliverToBoxAdapter(child: _buildTrending()),
-          SliverToBoxAdapter(child: _buildSectionTitle('All Courses', '${_filteredModules.length} found')),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final module = _filteredModules[index];
-                  return _buildModuleListCard(module);
-                },
-                childCount: _filteredModules.length,
-              ),
-            ),
+      body: RefreshIndicator(
+        onRefresh: _loadProgress,
+        color: AppColors.primary,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
           ),
-        ],
+          slivers: [
+            _buildHeader(),
+            SliverToBoxAdapter(child: _buildSearchBar()),
+            SliverToBoxAdapter(child: _buildFiltersSection()),
+            
+            if (!_isFiltering) ...[
+              SliverToBoxAdapter(child: _buildFeaturedCourses()),
+              SliverToBoxAdapter(child: _buildTrending()),
+              SliverToBoxAdapter(
+                child: _buildSectionTitle('All Courses', '${_filteredModules.length} found'),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final module = _filteredModules[index];
+                      return _buildModuleListCard(module);
+                    },
+                    childCount: _filteredModules.length,
+                  ),
+                ),
+              ),
+            ] else ...[
+              // Active search/filter results view
+              SliverToBoxAdapter(
+                child: _buildSectionTitle('Matching Topics', '${_filteredSubModules.length} found'),
+              ),
+              if (_filteredSubModules.isEmpty)
+                SliverToBoxAdapter(child: _buildEmptyState())
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final item = _filteredSubModules[index];
+                        return _buildTopicListCard(item.sub, item.parent);
+                      },
+                      childCount: _filteredSubModules.length,
+                    ),
+                  ),
+                ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -96,7 +185,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Explorer 🔍',
+                  'Explorer',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 26,
@@ -172,6 +261,110 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
     );
   }
 
+  Widget _buildFiltersSection() {
+    final colors = context.colors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Category filters
+        const Padding(
+          padding: EdgeInsets.fromLTRB(20, 16, 20, 8),
+          child: Text(
+            'CATEGORY',
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+          ),
+        ),
+        SizedBox(
+          height: 38,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: _categories.length,
+            itemBuilder: (context, index) {
+              final cat = _categories[index];
+              final isSelected = cat == _selectedCategory;
+              return GestureDetector(
+                onTap: () => setState(() => _selectedCategory = cat),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  margin: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: BoxDecoration(
+                    color: isSelected ? AppColors.primary : colors.cardBg,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: isSelected ? AppColors.primary : colors.divider,
+                      width: 1,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      cat,
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : colors.textSecondary,
+                        fontSize: 12,
+                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+
+        // Difficulty filters
+        const Padding(
+          padding: EdgeInsets.fromLTRB(20, 12, 20, 8),
+          child: Text(
+            'DIFFICULTY',
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+          ),
+        ),
+        SizedBox(
+          height: 38,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: _difficulties.length,
+            itemBuilder: (context, index) {
+              final diff = _difficulties[index];
+              final isSelected = diff == _selectedDifficulty;
+              return GestureDetector(
+                onTap: () => setState(() => _selectedDifficulty = diff),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  margin: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: BoxDecoration(
+                    color: isSelected ? AppColors.accent : colors.cardBg,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: isSelected ? AppColors.accent : colors.divider,
+                      width: 1,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      diff,
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : colors.textSecondary,
+                        fontSize: 12,
+                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildFeaturedCourses() {
     final featured = ModuleStateService.instance.modules.take(3).toList();
     return Column(
@@ -189,10 +382,13 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
               final module = featured[index];
               final color = Color(module.colorValue);
               return GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => CategoryDetailPage(module: module)),
-                ),
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => CategoryDetailPage(module: module)),
+                  );
+                  _loadProgress();
+                },
                 child: Container(
                   width: 260,
                   margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -289,60 +485,6 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
     );
   }
 
-  Widget _buildCategoryFilter() {
-    final colors = context.colors;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionTitle('Browse by Category', ''),
-        SizedBox(
-          height: 40,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: _categories.length,
-            itemBuilder: (context, index) {
-              final cat = _categories[index];
-              final isSelected = cat == _selectedCategory;
-              return GestureDetector(
-                onTap: () => setState(() => _selectedCategory = cat),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  margin: const EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: isSelected ? AppColors.primary : colors.cardBg,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: isSelected
-                            ? AppColors.primary.withValues(alpha: 0.3)
-                            : Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Text(
-                      cat,
-                      style: TextStyle(
-                        color: isSelected ? Colors.white : colors.textSecondary,
-                        fontSize: 12,
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildTrending() {
     final colors = context.colors;
     return Column(
@@ -422,10 +564,13 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
     final colors = context.colors;
     final color = Color(module.colorValue);
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => CategoryDetailPage(module: module)),
-      ),
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => CategoryDetailPage(module: module)),
+        );
+        _loadProgress();
+      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
@@ -494,7 +639,7 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                       Expanded(
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(4),
-                          child: LinearProgressIndicator(
+                           child: LinearProgressIndicator(
                             value: module.overallProgress,
                             backgroundColor: colors.surface,
                             valueColor: AlwaysStoppedAnimation<Color>(color),
@@ -525,6 +670,210 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(Icons.arrow_forward_rounded, color: color, size: 18),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTopicListCard(SubModule sub, Module parent) {
+    final colors = context.colors;
+    final parentColor = Color(parent.colorValue);
+
+    // Completion Status text and colors
+    String statusText = 'Not Started';
+    Color statusColor = colors.textHint;
+    Color statusBg = colors.surface;
+
+    if (sub.isCompleted) {
+      statusText = 'Completed';
+      statusColor = AppColors.success;
+      statusBg = colors.successLight;
+    } else if (sub.allMaterialsCompleted) {
+      statusText = 'Materials Completed';
+      statusColor = AppColors.accent;
+      statusBg = colors.accentLight;
+    } else if (sub.progress > 0.0) {
+      statusText = 'In Progress';
+      statusColor = AppColors.primary;
+      statusBg = colors.primarySurface;
+    }
+
+    return GestureDetector(
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SubDetailPage(subModule: sub, moduleColor: parentColor),
+          ),
+        );
+        _loadProgress();
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: colors.cardBg,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [parentColor, parentColor.withValues(alpha: 0.75)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Center(
+                child: Text(sub.icon, style: const TextStyle(fontSize: 24)),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          sub.name,
+                          style: TextStyle(
+                            color: colors.textPrimary,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: statusBg,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          statusText,
+                          style: TextStyle(
+                            color: statusColor,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Text(
+                        'Course: ${parent.name}',
+                        style: TextStyle(color: colors.textSecondary, fontSize: 11),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '•',
+                        style: TextStyle(color: colors.textHint, fontSize: 11),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: colors.surface,
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: colors.divider, width: 0.5),
+                        ),
+                        child: Text(
+                          sub.difficulty,
+                          style: TextStyle(
+                            color: sub.difficulty == 'Advanced'
+                                ? Colors.red.shade400
+                                : sub.difficulty == 'Intermediate'
+                                    ? AppColors.primary
+                                    : AppColors.success,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: sub.progress,
+                            backgroundColor: colors.surface,
+                            valueColor: AlwaysStoppedAnimation<Color>(parentColor),
+                            minHeight: 4,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${(sub.progress * 100).toInt()}%',
+                        style: TextStyle(
+                          color: parentColor,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                color: parentColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.chevron_right_rounded, color: parentColor, size: 18),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    final colors = context.colors;
+    return Padding(
+      padding: const EdgeInsets.all(40),
+      child: Center(
+        child: Column(
+          children: [
+            const Icon(Icons.search_off_rounded, size: 60, color: AppColors.textSecondary),
+            const SizedBox(height: 16),
+            Text(
+              'No topics match your filters',
+              style: TextStyle(color: colors.textPrimary, fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Try adjusting your search query, category, or difficulty level filters.',
+              style: TextStyle(color: colors.textSecondary, fontSize: 13),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
