@@ -7,13 +7,15 @@ import '../../models/quiz_model.dart';
 /// and action buttons to retry or return to the module.
 class QuizResultScreen extends StatelessWidget {
   final QuizResult result;
-  final Module module;
+  final Module? module;
+  final SubModule subModule;
   final Color moduleColor;
 
   const QuizResultScreen({
     super.key,
     required this.result,
-    required this.module,
+    this.module,
+    required this.subModule,
     required this.moduleColor,
   });
 
@@ -201,7 +203,7 @@ class QuizResultScreen extends StatelessWidget {
                     Expanded(
                       child: Text(
                         passed
-                            ? 'Congratulations! The module "${module.name}" is now marked as completed.'
+                            ? 'Congratulations! The topic "${subModule.name}" is now marked as completed.'
                             : 'Minimum passing score is 60%. Review the materials and try again.',
                         style: TextStyle(
                           color: passed
@@ -249,12 +251,13 @@ class QuizResultScreen extends StatelessWidget {
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: () {
-                    // Return all the way back to the module list
-                    Navigator.popUntil(context, (route) => route.isFirst);
+                    // Pop back to SubDetailPage (pops QuizResultScreen and QuizScreen)
+                    Navigator.pop(context);
+                    Navigator.pop(context);
                   },
-                  icon: const Icon(Icons.home_rounded, size: 20),
+                  icon: const Icon(Icons.arrow_back_rounded, size: 20),
                   label: const Text(
-                    'Back to Home',
+                    'Back to Topic',
                     style: TextStyle(
                         fontSize: 15, fontWeight: FontWeight.w700),
                   ),

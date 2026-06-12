@@ -10,12 +10,14 @@ import 'quiz_result_screen.dart';
 /// Quiz screen: loads questions from the API and presents them one at a time.
 /// Supports 4 multiple-choice options, tracks score, and navigates to results.
 class QuizScreen extends StatefulWidget {
-  final Module module;
+  final Module? module;
+  final SubModule subModule;
   final Color moduleColor;
 
   const QuizScreen({
     super.key,
-    required this.module,
+    this.module,
+    required this.subModule,
     required this.moduleColor,
   });
 
@@ -48,7 +50,7 @@ class _QuizScreenState extends State<QuizScreen> {
       _error = null;
     });
     try {
-      final quiz = await _api.fetchQuiz(widget.module.apiKey);
+      final quiz = await _api.fetchQuiz(widget.subModule.apiKey);
       if (!mounted) return;
       setState(() {
         _quiz = quiz;
@@ -93,14 +95,13 @@ class _QuizScreenState extends State<QuizScreen> {
     final passed = score >= 60;
 
     // Save quiz result and update module progress
-    await _progress.saveQuizResult(widget.module.apiKey, score, passed);
+    await _progress.saveQuizResult(widget.subModule.apiKey, score, passed);
     // Record streak activity for quiz submission
     await StreakService.instance.recordActivity();
     if (passed) {
-      for (final sub in widget.module.subModules) {
-        sub.progress = 1.0;
-        sub.isCompleted = true;
-      }
+      widget.subModule.progress = 1.0;
+      widget.subModule.isQuizPassed = true;
+      widget.subModule.isCompleted = true;
     }
 
     if (!mounted) return;
@@ -115,6 +116,7 @@ class _QuizScreenState extends State<QuizScreen> {
             correctAnswers: _correctCount,
           ),
           module: widget.module,
+          subModule: widget.subModule,
           moduleColor: widget.moduleColor,
         ),
       ),
@@ -151,7 +153,7 @@ class _QuizScreenState extends State<QuizScreen> {
         ),
       ),
       title: Text(
-        '${widget.module.name} Quiz',
+        '${widget.subModule.name} Quiz',
         style: const TextStyle(
             color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700),
       ),
