@@ -11,18 +11,26 @@ class SubModule {
   /// Runtime progress (0.0–1.0), loaded from persistent storage.
   double progress;
   bool isCompleted;
+  
+  /// Quiz state
+  bool isQuizPassed;
+  double quizScore;
 
   SubModule({
     required this.name,
     required this.description,
     required this.icon,
     required this.apiKey,
-    this.totalLessons = 5,
+    this.totalLessons = 3,
     this.progress = 0.0,
     this.isCompleted = false,
+    this.isQuizPassed = false,
+    this.quizScore = 0.0,
   });
 
   int get completedLessons => (progress * totalLessons).round();
+  
+  bool get allMaterialsCompleted => progress >= 1.0;
 }
 
 /// Represents a top-level learning module (e.g. CodeLab, BizLab).
@@ -58,7 +66,7 @@ class Module {
   int get completedSubModules =>
       subModules.where((s) => s.isCompleted).length;
 
-  /// Whether all submodules are completed (unlocks the quiz).
+  /// Whether all topics in this module are completed (materials + quiz).
   bool get allSubModulesCompleted =>
       subModules.isNotEmpty &&
       subModules.every((s) => s.isCompleted);

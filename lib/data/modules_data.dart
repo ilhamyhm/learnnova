@@ -20,11 +20,11 @@ List<Module> buildModules() => [
     category: 'Programming',
     apiKey: 'codelab',
     subModules: [
-      SubModule(name: 'HTML', description: 'Learn the building blocks of the web.', icon: '🌐', totalLessons: 6, apiKey: 'codelab_html'),
-      SubModule(name: 'CSS', description: 'Style the web beautifully.', icon: '🎨', totalLessons: 5, apiKey: 'codelab_css'),
-      SubModule(name: 'PHP', description: 'Build dynamic server-side applications.', icon: '⚙️', totalLessons: 5, apiKey: 'codelab_php'),
-      SubModule(name: 'Python', description: 'The world\'s most versatile language.', icon: '🐍', totalLessons: 5, apiKey: 'codelab_python'),
-      SubModule(name: 'JavaScript', description: 'The language of the web.', icon: '⚡', totalLessons: 5, apiKey: 'codelab_js'),
+      SubModule(name: 'HTML', description: 'Learn the building blocks of the web.', icon: '🌐', totalLessons: 3, apiKey: 'codelab_html'),
+      SubModule(name: 'CSS', description: 'Style the web beautifully.', icon: '🎨', totalLessons: 3, apiKey: 'codelab_css'),
+      SubModule(name: 'PHP', description: 'Build dynamic server-side applications.', icon: '⚙️', totalLessons: 3, apiKey: 'codelab_php'),
+      SubModule(name: 'Python', description: 'The world\'s most versatile language.', icon: '🐍', totalLessons: 3, apiKey: 'codelab_python'),
+      SubModule(name: 'JavaScript', description: 'The language of the web.', icon: '⚡', totalLessons: 3, apiKey: 'codelab_js'),
     ],
   ),
 
@@ -38,9 +38,9 @@ List<Module> buildModules() => [
     category: 'Design',
     apiKey: 'creative_studio',
     subModules: [
-      SubModule(name: 'UI/UX Design', description: 'Design experiences that users love.', icon: '🖥️', totalLessons: 4, apiKey: 'creative_studio_uiux'),
-      SubModule(name: 'Graphic Design', description: 'Create stunning visuals.', icon: '🖌️', totalLessons: 4, apiKey: 'creative_studio_graphic'),
-      SubModule(name: 'Video Editing', description: 'Tell stories through video.', icon: '🎬', totalLessons: 4, apiKey: 'creative_studio_video'),
+      SubModule(name: 'UI/UX Design', description: 'Design experiences that users love.', icon: '🖥️', totalLessons: 3, apiKey: 'creative_studio_uiux'),
+      SubModule(name: 'Graphic Design', description: 'Create stunning visuals.', icon: '🖌️', totalLessons: 3, apiKey: 'creative_studio_graphic'),
+      SubModule(name: 'Video Editing', description: 'Tell stories through video.', icon: '🎬', totalLessons: 3, apiKey: 'creative_studio_video'),
     ],
   ),
 
@@ -54,8 +54,8 @@ List<Module> buildModules() => [
     category: 'Animation',
     apiKey: 'animation_lab',
     subModules: [
-      SubModule(name: '2D Animation', description: 'Master the timeless art of 2D animation.', icon: '🎞️', totalLessons: 4, apiKey: 'animation_lab_2d'),
-      SubModule(name: '3D Animation', description: 'Enter the world of 3D.', icon: '🌀', totalLessons: 4, apiKey: 'animation_lab_3d'),
+      SubModule(name: '2D Animation', description: 'Master the timeless art of 2D animation.', icon: '🎞️', totalLessons: 3, apiKey: 'animation_lab_2d'),
+      SubModule(name: '3D Animation', description: 'Enter the world of 3D.', icon: '🌀', totalLessons: 3, apiKey: 'animation_lab_3d'),
     ],
   ),
 
@@ -69,9 +69,9 @@ List<Module> buildModules() => [
     category: 'Business',
     apiKey: 'bizlab',
     subModules: [
-      SubModule(name: 'Digital Marketing', description: 'Grow businesses online.', icon: '📈', totalLessons: 4, apiKey: 'bizlab_marketing'),
-      SubModule(name: 'Public Speaking', description: 'Speak with confidence.', icon: '🎤', totalLessons: 4, apiKey: 'bizlab_speaking'),
-      SubModule(name: 'Productivity', description: 'Work smarter, not harder.', icon: '⏱️', totalLessons: 4, apiKey: 'bizlab_productivity'),
+      SubModule(name: 'Digital Marketing', description: 'Grow businesses online.', icon: '📈', totalLessons: 3, apiKey: 'bizlab_marketing'),
+      SubModule(name: 'Public Speaking', description: 'Speak with confidence.', icon: '🎤', totalLessons: 3, apiKey: 'bizlab_speaking'),
+      SubModule(name: 'Productivity', description: 'Work smarter, not harder.', icon: '⏱️', totalLessons: 3, apiKey: 'bizlab_productivity'),
     ],
   ),
 
@@ -85,8 +85,8 @@ List<Module> buildModules() => [
     category: 'Languages',
     apiKey: 'language_hub',
     subModules: [
-      SubModule(name: 'English', description: 'Master the global language.', icon: '🇬🇧', totalLessons: 4, apiKey: 'language_hub_english'),
-      SubModule(name: 'Indonesian', description: 'Learn Bahasa Indonesia.', icon: '🇮🇩', totalLessons: 4, apiKey: 'language_hub_indonesian'),
+      SubModule(name: 'English', description: 'Master the global language.', icon: '🇬🇧', totalLessons: 3, apiKey: 'language_hub_english'),
+      SubModule(name: 'Indonesian', description: 'Learn Bahasa Indonesia.', icon: '🇮🇩', totalLessons: 3, apiKey: 'language_hub_indonesian'),
     ],
   ),
 
@@ -100,10 +100,10 @@ List<Module> buildModules() => [
     category: 'Academic',
     apiKey: 'smart_academy',
     subModules: [
-      SubModule(name: 'Mathematics', description: 'Build strong mathematical foundations.', icon: '📐', totalLessons: 4, apiKey: 'smart_academy_math'),
-      SubModule(name: 'Physics', description: 'Understand the laws of the universe.', icon: '⚛️', totalLessons: 4, apiKey: 'smart_academy_physics'),
-      SubModule(name: 'Chemistry', description: 'Explore matter and reactions.', icon: '🧪', totalLessons: 4, apiKey: 'smart_academy_chemistry'),
-      SubModule(name: 'Biology', description: 'Discover the science of life.', icon: '🧬', totalLessons: 4, apiKey: 'smart_academy_biology'),
+      SubModule(name: 'Mathematics', description: 'Build strong mathematical foundations.', icon: '📐', totalLessons: 3, apiKey: 'smart_academy_math'),
+      SubModule(name: 'Physics', description: 'Understand the laws of the universe.', icon: '⚛️', totalLessons: 3, apiKey: 'smart_academy_physics'),
+      SubModule(name: 'Chemistry', description: 'Explore matter and reactions.', icon: '🧪', totalLessons: 3, apiKey: 'smart_academy_chemistry'),
+      SubModule(name: 'Biology', description: 'Discover the science of life.', icon: '🧬', totalLessons: 3, apiKey: 'smart_academy_biology'),
     ],
   ),
 
@@ -117,9 +117,9 @@ List<Module> buildModules() => [
     category: 'Creative',
     apiKey: 'fun_skill',
     subModules: [
-      SubModule(name: 'Unity Game Dev', description: 'Build your own games!', icon: '🎮', totalLessons: 4, apiKey: 'fun_skill_unity'),
-      SubModule(name: 'Story Writing', description: 'Craft compelling narratives.', icon: '📝', totalLessons: 4, apiKey: 'fun_skill_writing'),
-      SubModule(name: 'Content Creator', description: 'Build your online presence.', icon: '📱', totalLessons: 4, apiKey: 'fun_skill_content'),
+      SubModule(name: 'Unity Game Dev', description: 'Build your own games!', icon: '🎮', totalLessons: 3, apiKey: 'fun_skill_unity'),
+      SubModule(name: 'Story Writing', description: 'Craft compelling narratives.', icon: '📝', totalLessons: 3, apiKey: 'fun_skill_writing'),
+      SubModule(name: 'Content Creator', description: 'Build your online presence.', icon: '📱', totalLessons: 3, apiKey: 'fun_skill_content'),
     ],
   ),
 
@@ -133,9 +133,9 @@ List<Module> buildModules() => [
     category: 'Sports & Fitness',
     apiKey: 'sports',
     subModules: [
-      SubModule(name: 'Football Basics', description: 'Master the beautiful game.', icon: '⚽', totalLessons: 4, apiKey: 'sports_football'),
-      SubModule(name: 'Basketball', description: 'Take your game to the court.', icon: '🏀', totalLessons: 4, apiKey: 'sports_basketball'),
-      SubModule(name: 'Home Workout', description: 'Get fit without a gym.', icon: '💪', totalLessons: 4, apiKey: 'sports_fitness'),
+      SubModule(name: 'Football Basics', description: 'Master the beautiful game.', icon: '⚽', totalLessons: 3, apiKey: 'sports_football'),
+      SubModule(name: 'Basketball', description: 'Take your game to the court.', icon: '🏀', totalLessons: 3, apiKey: 'sports_basketball'),
+      SubModule(name: 'Home Workout', description: 'Get fit without a gym.', icon: '💪', totalLessons: 3, apiKey: 'sports_fitness'),
     ],
   ),
 ];
