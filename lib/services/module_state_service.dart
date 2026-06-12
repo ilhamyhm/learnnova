@@ -38,15 +38,9 @@ class ModuleStateService {
       for (final sub in module.subModules) {
         final progress = await progressService.getMaterialProgress(sub.apiKey);
         sub.progress = progress;
-        sub.isCompleted = progress >= 1.0;
-      }
-      // If the quiz was passed, mark all submodules complete
-      final quizPassed = await progressService.isQuizPassed(module.apiKey);
-      if (quizPassed) {
-        for (final sub in module.subModules) {
-          sub.progress = 1.0;
-          sub.isCompleted = true;
-        }
+        sub.isQuizPassed = await progressService.isQuizPassed(sub.apiKey);
+        sub.quizScore = (await progressService.getQuizScore(sub.apiKey)) ?? 0.0;
+        sub.isCompleted = sub.allMaterialsCompleted && sub.isQuizPassed;
       }
     }
 
@@ -66,22 +60,13 @@ class ModuleStateService {
     final progressService = UserProgressService.instance;
 
     for (final module in _modules) {
-      if (module.apiKey == moduleApiKey) {
-        // Check quiz pass status
-        final quizPassed = await progressService.isQuizPassed(moduleApiKey);
-        if (quizPassed) {
-          for (final sub in module.subModules) {
-            sub.progress = 1.0;
-            sub.isCompleted = true;
-          }
-          return;
-        }
-      }
       for (final sub in module.subModules) {
         if (sub.apiKey == subModuleKey) {
           final progress = await progressService.getMaterialProgress(subModuleKey);
           sub.progress = progress;
-          sub.isCompleted = progress >= 1.0;
+          sub.isQuizPassed = await progressService.isQuizPassed(sub.apiKey);
+          sub.quizScore = (await progressService.getQuizScore(sub.apiKey)) ?? 0.0;
+          sub.isCompleted = sub.allMaterialsCompleted && sub.isQuizPassed;
           return;
         }
       }
@@ -92,16 +77,12 @@ class ModuleStateService {
   Future<void> refreshAll() async {
     final progressService = UserProgressService.instance;
     for (final module in _modules) {
-      final quizPassed = await progressService.isQuizPassed(module.apiKey);
       for (final sub in module.subModules) {
-        if (quizPassed) {
-          sub.progress = 1.0;
-          sub.isCompleted = true;
-        } else {
-          final progress = await progressService.getMaterialProgress(sub.apiKey);
-          sub.progress = progress;
-          sub.isCompleted = progress >= 1.0;
-        }
+        final progress = await progressService.getMaterialProgress(sub.apiKey);
+        sub.progress = progress;
+        sub.isQuizPassed = await progressService.isQuizPassed(sub.apiKey);
+        sub.quizScore = (await progressService.getQuizScore(sub.apiKey)) ?? 0.0;
+        sub.isCompleted = sub.allMaterialsCompleted && sub.isQuizPassed;
       }
     }
   }

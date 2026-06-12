@@ -38,11 +38,11 @@ class ApiService {
 
   // ─── Quizzes ─────────────────────────────────────────────────────────────
 
-  /// Fetches quiz questions for [moduleKey] (e.g. "codelab").
+  /// Fetches quiz questions for [subModuleKey] (e.g. "codelab_html").
   /// Returns [ModuleQuizResponse] from API or falls back to mock data.
-  Future<ModuleQuizResponse> fetchQuiz(String moduleKey) async {
+  Future<ModuleQuizResponse> fetchQuiz(String subModuleKey) async {
     try {
-      final uri = Uri.parse('$_baseUrl/quizzes/$moduleKey');
+      final uri = Uri.parse('$_baseUrl/quizzes/$subModuleKey');
       final response = await http.get(uri).timeout(const Duration(seconds: 8));
       if (response.statusCode == 200) {
         return ModuleQuizResponse.fromJson(
@@ -52,7 +52,7 @@ class ApiService {
     } catch (_) {
       // Network unreachable — use mock data
     }
-    return _mockQuiz(moduleKey);
+    return _mockQuiz(subModuleKey);
   }
 
   // ─── Progress Persistence ─────────────────────────────────────────────────
@@ -127,12 +127,45 @@ class ApiService {
   // ─── Mock Data ────────────────────────────────────────────────────────────
 
   ModuleMaterialsResponse _mockMaterials(String key) {
-    final data = _allMockMaterials[key] ?? _allMockMaterials['codelab_html']!;
+    var data = _allMockMaterials[key];
+    if (data == null) {
+      data = {
+        'module_id': 0,
+        'title': key.replaceAll('_', ' ').toUpperCase(),
+        'level': 'Beginner',
+        'tujuan_pembelajaran': 'Learn the basics of $key.',
+        'total_slide': 3,
+        'materials': List.generate(3, (i) => {
+          'material_id': i + 1,
+          'title': 'Concept ${i + 1}',
+          'content': 'This is a dynamically generated material for $key. Here you will learn about concept ${i + 1} in detail.',
+          'example': null,
+        }),
+      };
+    } else {
+      // Enforce exactly 3 materials
+      final list = (data['materials'] as List).take(3).toList();
+      data = Map<String, dynamic>.from(data);
+      data['materials'] = list;
+      data['total_slide'] = 3;
+    }
     return ModuleMaterialsResponse.fromJson(data);
   }
 
-  ModuleQuizResponse _mockQuiz(String key) {
-    final data = _allMockQuizzes[key] ?? _allMockQuizzes['codelab']!;
+  ModuleQuizResponse _mockQuiz(String subModuleKey) {
+    var data = _allMockQuizzes[subModuleKey];
+    if (data == null) {
+      data = {
+        'module_id': 0,
+        'quiz_title': '${subModuleKey.replaceAll('_', ' ').toUpperCase()} Quiz',
+        'questions': List.generate(4, (i) => {
+          'question_id': i + 1,
+          'question': 'What is a key concept in $subModuleKey for part ${i+1}?',
+          'options': ['Option A', 'Option B', 'Option C', 'Option D'],
+          'correct_answer': 'Option A',
+        }),
+      };
+    }
     return ModuleQuizResponse.fromJson(data);
   }
 
