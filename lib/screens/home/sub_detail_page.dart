@@ -3,6 +3,7 @@ import '../../constants/app_colors.dart';
 import '../../models/module_model.dart';
 import '../../services/api_service.dart';
 import '../material/material_screen.dart';
+import '../quiz/quiz_screen.dart';
 
 /// Shows details about a specific submodule (topic) and lets the user
 /// open the MaterialScreen to read learning slides.
@@ -31,11 +32,14 @@ class _SubDetailPageState extends State<SubDetailPage> {
 
   Future<void> _loadProgress() async {
     final progress = await _api.getMaterialProgress(widget.subModule.apiKey);
-    final viewed = await _api.getViewedSlides(widget.subModule.apiKey);
+    final passed = await _api.isQuizPassed(widget.subModule.apiKey);
+    final score = await _api.getQuizScore(widget.subModule.apiKey) ?? 0.0;
     if (mounted) {
       setState(() {
         widget.subModule.progress = progress;
-        widget.subModule.isCompleted = viewed.length >= widget.subModule.totalLessons;
+        widget.subModule.isQuizPassed = passed;
+        widget.subModule.quizScore = score;
+        widget.subModule.isCompleted = widget.subModule.allMaterialsCompleted && widget.subModule.isQuizPassed;
       });
     }
   }
@@ -308,7 +312,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
                 '${sub.completedLessons} of ${sub.totalLessons} lessons completed',
                 style: TextStyle(color: colors.textSecondary, fontSize: 12),
               ),
-              if (sub.isCompleted)
+              if (sub.isQuizPassed)
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -317,7 +321,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Text(
-                    '🏆 Completed!',
+                    '🏆 Topic Completed!',
                     style: TextStyle(
                         color: AppColors.success,
                         fontSize: 11,
@@ -421,6 +425,9 @@ class _SubDetailPageState extends State<SubDetailPage> {
   Widget _buildBottomBar(
       BuildContext context, Color color, SubModule sub) {
     final colors = context.colors;
+    final allMaterialsDone = sub.allMaterialsCompleted;
+    final quizPassed = sub.isQuizPassed;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 30),
       decoration: BoxDecoration(
@@ -437,54 +444,112 @@ class _SubDetailPageState extends State<SubDetailPage> {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => MaterialScreen(
-                      subModule: sub,
-                      moduleColor: color,
+          if (quizPassed)
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: colors.successLight,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.success.withValues(alpha: 0.4)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.emoji_events_rounded, color: AppColors.success, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Quiz Passed: ${(sub.quizScore * 100).toInt()}%',
+                    style: const TextStyle(
+                      color: AppColors.success,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                );
-                _loadProgress();
-              },
-              icon: Icon(
-                sub.isCompleted
-                    ? Icons.replay_rounded
-                    : Icons.play_arrow_rounded,
-                size: 22,
-              ),
-              label: Text(
-                sub.isCompleted ? 'Review Materials' : 'Start Learning',
-                style: const TextStyle(
-                    fontSize: 15, fontWeight: FontWeight.w700),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: color,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
-                elevation: 0,
+                ],
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: IconButton(
-              icon: Icon(Icons.share_rounded, color: color),
-              onPressed: () {},
-              padding: const EdgeInsets.all(14),
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => MaterialScreen(
+                          subModule: sub,
+                          moduleColor: color,
+                        ),
+                      ),
+                    );
+                    _loadProgress();
+                  },
+                  icon: Icon(
+                    allMaterialsDone
+                        ? Icons.menu_book_rounded
+                        : Icons.play_arrow_rounded,
+                    size: 20,
+                  ),
+                  label: Text(
+                    allMaterialsDone ? 'Review Materials' : 'Start Learning',
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w700),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colors.surface,
+                    foregroundColor: color,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                    elevation: 0,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: allMaterialsDone
+                      ? () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => QuizScreen(
+                                module: null,
+                                subModule: sub,
+                                moduleColor: color,
+                              ),
+                            ),
+                          );
+                          _loadProgress();
+                        }
+                      : null,
+                  icon: Icon(
+                    allMaterialsDone ? Icons.quiz_rounded : Icons.lock_outline_rounded,
+                    size: 20,
+                  ),
+                  label: Text(
+                    quizPassed ? 'Retake Quiz' : 'Take Quiz',
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w700),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: color,
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: colors.surface,
+                    disabledForegroundColor: colors.textHint,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                    elevation: 0,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../models/module_model.dart';
-import '../../services/user_progress_service.dart';
-import '../quiz/quiz_screen.dart';
+import '../../services/module_state_service.dart';
 import 'sub_detail_page.dart';
 
 /// Shows the list of submodules (topics) inside a module.
@@ -18,9 +17,6 @@ class CategoryDetailPage extends StatefulWidget {
 }
 
 class _CategoryDetailPageState extends State<CategoryDetailPage> {
-  final _progress = UserProgressService.instance;
-  bool _quizPassed = false;
-
   @override
   void initState() {
     super.initState();
@@ -28,14 +24,9 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
   }
 
   Future<void> _loadProgress() async {
-    for (final sub in widget.module.subModules) {
-      final progress = await _progress.getMaterialProgress(sub.apiKey);
-      sub.progress = progress;
-      sub.isCompleted = progress >= 1.0;
-    }
-    final passed = await _progress.isQuizPassed(widget.module.apiKey);
+    await ModuleStateService.instance.refreshAll();
     if (mounted) {
-      setState(() => _quizPassed = passed);
+      setState(() {});
     }
   }
 
@@ -43,7 +34,6 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final color = Color(widget.module.colorValue);
-    final allCompleted = widget.module.allSubModulesCompleted;
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -100,13 +90,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
               ),
             ),
           ),
-          // Quiz button at the bottom
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
-            sliver: SliverToBoxAdapter(
-              child: _buildQuizButton(context, color, allCompleted),
-            ),
-          ),
+          // No longer needed: Quiz button at the bottom
         ],
       ),
     );
@@ -457,78 +441,5 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
     );
   }
 
-  Widget _buildQuizButton(BuildContext context, Color color, bool allCompleted) {
-    final colors = context.colors;
-    if (_quizPassed) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: colors.successLight,
-          borderRadius: BorderRadius.circular(18),
-          border:
-              Border.all(color: AppColors.success.withValues(alpha: 0.4)),
-        ),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.emoji_events_rounded,
-                color: AppColors.success, size: 22),
-            SizedBox(width: 10),
-            Text(
-              '🏆 Quiz Passed — Module Completed!',
-              style: TextStyle(
-                color: AppColors.success,
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
 
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: allCompleted
-            ? () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => QuizScreen(
-                      module: widget.module,
-                      moduleColor: color,
-                    ),
-                  ),
-                );
-                _loadProgress();
-              }
-            : null,
-        icon: Icon(
-          allCompleted
-              ? Icons.quiz_rounded
-              : Icons.lock_outline_rounded,
-          size: 20,
-        ),
-        label: Text(
-          allCompleted
-              ? 'Take Module Quiz'
-              : 'Complete all topics to unlock quiz',
-          style: const TextStyle(
-              fontSize: 15, fontWeight: FontWeight.w700),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: colors.surface,
-          disabledForegroundColor: colors.textHint,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16)),
-          elevation: 0,
-        ),
-      ),
-    );
-  }
 }
