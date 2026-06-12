@@ -98,8 +98,6 @@ class UserProgressService {
     await prefs.setBool(_key(_pfxPassed, moduleKey), passed);
   }
 
-  // ─── Utility ──────────────────────────────────────────────────────────────
-
   /// Clears **all** progress data for the current user only.
   /// Useful for a "reset progress" feature without touching other users' data.
   Future<void> clearCurrentUserProgress() async {
@@ -110,4 +108,15 @@ class UserProgressService {
       await prefs.remove(k);
     }
   }
+
+  /// Returns the number of module quizzes that the current user has passed.
+  Future<int> getPassedQuizCount() async {
+    final prefs = await SharedPreferences.getInstance();
+    final prefix = 'uid:$_uid:$_pfxPassed';
+    return prefs
+        .getKeys()
+        .where((k) => k.startsWith(prefix) && (prefs.getBool(k) ?? false))
+        .length;
+  }
 }
+
