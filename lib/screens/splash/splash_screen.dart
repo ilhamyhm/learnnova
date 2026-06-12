@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
+import '../../services/app_localizations.dart';
 import '../auth/auth_wrapper.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -101,7 +102,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               const SizedBox(height: 8),
               // Subtitle
               Text(
-                'Learn Smarter, Grow Faster',
+                context.tr('app_subtitle'),
                 style: TextStyle(
                   color: colors.textSecondary,
                   fontSize: 16,

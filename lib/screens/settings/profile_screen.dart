@@ -4,6 +4,7 @@ import '../../constants/app_colors.dart';
 import '../../services/firebase_auth_service.dart';
 import '../../services/module_state_service.dart';
 import '../../services/streak_service.dart';
+import '../../services/app_localizations.dart';
 import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -46,19 +47,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Log Out?'),
-        content: const Text(
-          'Are you sure you want to log out of LearnNova?',
-          style: TextStyle(color: AppColors.textSecondary),
+        title: Text(context.tr('logout_question')),
+        content: Text(
+          context.tr('logout_confirm'),
+          style: const TextStyle(color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
+            child: Text(context.tr('cancel'), style: const TextStyle(color: AppColors.textSecondary)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Log Out', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w700)),
+            child: Text(context.tr('logout'), style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -272,21 +273,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           const Icon(Icons.workspace_premium_rounded, color: Colors.amber, size: 22),
           const SizedBox(width: 10),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Pro Learner',
-                  style: TextStyle(
+                  context.tr('pro_learner'),
+                  style: const TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 Text(
-                  'Intermediate Level',
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                  context.tr('intermediate_level'),
+                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
                 ),
               ],
             ),
@@ -336,11 +337,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Row(
             children: [
-              _profileStat('$completedModules/$totalModules', 'Modules', AppColors.primary),
+              _profileStat('$completedModules/$totalModules', context.tr('modules'), AppColors.primary),
               _vertDiv(),
-              _profileStat('$completedLessons/$totalLessons', 'Lessons', AppColors.success),
+              _profileStat('$completedLessons/$totalLessons', context.tr('lessons'), AppColors.success),
               _vertDiv(),
-              _profileStat('🔥 $_streak', 'Streak', AppColors.error),
+              _profileStat('🔥 $_streak', context.tr('day_streak_title'), AppColors.error),
             ],
           ),
           const SizedBox(height: 16),
@@ -348,11 +349,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 16),
           Row(
             children: [
-              _profileStat('${avgQuizScore.toInt()}%', 'Avg Score', AppColors.accent),
+              _profileStat('${avgQuizScore.toInt()}%', context.tr('avg_score_short'), AppColors.accent),
               _vertDiv(),
-              _profileStat('$passedQuizzes', 'Quizzes Passed', AppColors.moduleLanguage),
+              _profileStat('$passedQuizzes', context.tr('quizzes_passed'), AppColors.moduleLanguage),
               _vertDiv(),
-              _profileStat('$completedSubModules/$totalSubModules', 'Topics Done', AppColors.moduleCodeLab),
+              _profileStat('$completedSubModules/$totalSubModules', context.tr('topics_done'), AppColors.moduleCodeLab),
             ],
           ),
         ],
@@ -406,22 +407,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Personal Information',
-            style: TextStyle(
+          Text(
+            context.tr('personal_information'),
+            style: const TextStyle(
               color: AppColors.textPrimary,
               fontSize: 15,
               fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 16),
-          _infoRow(Icons.person_rounded, 'Full Name', _user?.displayName ?? 'LearnNova User'),
+          _infoRow(Icons.person_rounded, context.tr('full_name'), _user?.displayName ?? 'LearnNova User'),
           const Divider(height: 20, color: AppColors.divider),
-          _infoRow(Icons.email_rounded, 'Email', _user?.email ?? '—'),
+          _infoRow(Icons.email_rounded, context.tr('email'), _user?.email ?? '—'),
           const Divider(height: 20, color: AppColors.divider),
-          _infoRow(Icons.phone_rounded, 'Phone', '+62 812 3456 7890'),
+          _infoRow(Icons.phone_rounded, context.tr('phone'), '+62 812 3456 7890'),
           const Divider(height: 20, color: AppColors.divider),
-          _infoRow(Icons.location_on_rounded, 'Location', 'Jakarta, Indonesia'),
+          _infoRow(Icons.location_on_rounded, context.tr('location'), 'Jakarta, Indonesia'),
         ],
       ),
     );
@@ -488,9 +489,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               const Text('🏅', style: TextStyle(fontSize: 24)),
               const SizedBox(width: 8),
-              const Text(
-                'Learning Level',
-                style: TextStyle(
+              Text(
+                context.tr('learning_level'),
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
@@ -498,7 +499,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const Spacer(),
               Text(
-                '${completed} / ${total} topics done',
+                '${completed} / ${total} ${context.tr('topics_done').toLowerCase()}',
                 style: const TextStyle(color: Colors.white70, fontSize: 12),
               ),
             ],
@@ -515,7 +516,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            '${(levelProgress * 100).toInt()}% of topics completed — Keep it up! 🚀',
+            context.tr('level_progress_desc').replaceAll('{pct}', '${(levelProgress * 100).toInt()}'),
             style: const TextStyle(color: Colors.white70, fontSize: 12),
           ),
         ],
@@ -539,7 +540,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               }
             },
             icon: const Icon(Icons.edit_rounded, size: 18),
-            label: const Text('Edit Profile', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+            label: Text(context.tr('edit_profile'), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
@@ -552,9 +553,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           OutlinedButton.icon(
             onPressed: () => _logout(context),
             icon: const Icon(Icons.logout_rounded, size: 18, color: AppColors.error),
-            label: const Text(
-              'Log Out',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.error),
+            label: Text(
+              context.tr('logout'),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.error),
             ),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size(double.infinity, 52),

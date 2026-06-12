@@ -1,8 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_theme.dart';
+import '../../constants/app_locale.dart';
 import '../../services/firebase_auth_service.dart';
+import '../../services/app_localizations.dart';
 import '../auth/forgot_password_screen.dart';
 import 'edit_profile_screen.dart';
 import 'help_support_screen.dart';
@@ -20,8 +23,13 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
   bool _darkModeEnabled = themeNotifier.value == ThemeMode.dark;
-  String _selectedLanguage = 'English';
-
+ 
+  String get _selectedLanguage {
+    final code = localeNotifier.value.languageCode;
+    if (code == 'id') return 'Bahasa Indonesia';
+    return 'English';
+  }
+ 
   User? get _user => FirebaseAuth.instance.currentUser;
 
   @override
@@ -35,10 +43,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         slivers: [
           _buildHeader(context),
           SliverToBoxAdapter(child: _buildProfileTile(context)),
-          SliverToBoxAdapter(child: _buildSection(context, 'Account', _accountItems(context))),
-          SliverToBoxAdapter(child: _buildSection(context, 'Preferences', _preferenceItems(context))),
-          SliverToBoxAdapter(child: _buildSection(context, 'Support', _supportItems(context))),
-          SliverToBoxAdapter(child: _buildSection(context, 'About', _aboutItems(context))),
+          SliverToBoxAdapter(child: _buildSection(context, context.tr('account'), _accountItems(context))),
+          SliverToBoxAdapter(child: _buildSection(context, context.tr('preferences'), _preferenceItems(context))),
+          SliverToBoxAdapter(child: _buildSection(context, context.tr('support'), _supportItems(context))),
+          SliverToBoxAdapter(child: _buildSection(context, context.tr('about'), _aboutItems(context))),
           SliverToBoxAdapter(child: _buildLogout(context)),
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
@@ -56,21 +64,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
           bottom: 20,
         ),
         decoration: const BoxDecoration(gradient: AppColors.heroGradient),
-        child: const Column(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Settings',
-              style: TextStyle(
+              context.tr('settings_title').replaceAll(' ⚙️', ''),
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 26,
                 fontWeight: FontWeight.w800,
               ),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
-              'Manage your preferences',
-              style: TextStyle(color: Colors.white70, fontSize: 13),
+              context.tr('manage_preferences'),
+              style: const TextStyle(color: Colors.white70, fontSize: 13),
             ),
           ],
         ),
@@ -146,14 +154,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _user?.email ?? '',
                     style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
-                  const SizedBox(height: 6),
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.workspace_premium_rounded, color: Colors.amber, size: 14),
-                      SizedBox(width: 4),
+                      const Icon(Icons.workspace_premium_rounded, color: Colors.amber, size: 14),
+                      const SizedBox(width: 4),
                       Text(
-                        'Pro Learner',
-                        style: TextStyle(
+                        context.tr('pro_learner'),
+                        style: const TextStyle(
                           color: Colors.amber,
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -237,8 +244,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       icon: Icons.person_rounded,
       iconColor: AppColors.primary,
-      title: 'Edit Profile',
-      subtitle: 'Update your personal info',
+      title: context.tr('edit_profile'),
+      subtitle: context.tr('update_personal_info'),
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const EditProfileScreen()),
@@ -248,8 +255,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       icon: Icons.lock_rounded,
       iconColor: AppColors.moduleCodeLab,
-      title: 'Change Password',
-      subtitle: 'Update your password',
+      title: context.tr('change_password'),
+      subtitle: context.tr('update_password'),
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
@@ -259,7 +266,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       icon: Icons.email_rounded,
       iconColor: AppColors.moduleCreative,
-      title: 'Email Address',
+      title: context.tr('email_address'),
       subtitle: _user?.email ?? '—',
       onTap: () => _showComingSoon(context),
     ),
@@ -270,8 +277,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       icon: Icons.notifications_rounded,
       iconColor: AppColors.accent,
-      title: 'Notifications',
-      subtitle: 'Push, email notifications',
+      title: context.tr('notifications'),
+      subtitle: context.tr('push_email_notif'),
       value: _notificationsEnabled,
       onChanged: (v) {
         setState(() => _notificationsEnabled = v);
@@ -285,8 +292,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       icon: Icons.dark_mode_rounded,
       iconColor: AppColors.primary,
-      title: 'Dark Mode',
-      subtitle: 'Toggle dark appearance',
+      title: context.tr('dark_mode'),
+      subtitle: context.tr('toggle_dark'),
       value: _darkModeEnabled,
       onChanged: (v) {
         setState(() => _darkModeEnabled = v);
@@ -297,17 +304,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       icon: Icons.language_rounded,
       iconColor: AppColors.moduleLanguage,
-      title: 'Language',
+      title: context.tr('language'),
       value: _selectedLanguage,
-      options: ['English', 'Indonesian', 'Spanish'],
-      onChanged: (v) => setState(() => _selectedLanguage = v!),
+      options: const ['English', 'Bahasa Indonesia'],
+      onChanged: (v) async {
+        if (v == null) return;
+        final newLocale = v == 'Bahasa Indonesia' ? const Locale('id') : const Locale('en');
+        localeNotifier.value = newLocale;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('language_code', newLocale.languageCode);
+      },
     ),
     _settingsTile(
       context: context,
       icon: Icons.privacy_tip_rounded,
       iconColor: AppColors.moduleAnimation,
-      title: 'Privacy Settings',
-      subtitle: 'Manage data & permissions',
+      title: context.tr('privacy_settings'),
+      subtitle: context.tr('manage_data_permissions'),
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const PrivacySettingsScreen()),
@@ -320,8 +333,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       icon: Icons.help_rounded,
       iconColor: AppColors.primary,
-      title: 'Help & Support',
-      subtitle: 'FAQs, contact us',
+      title: context.tr('help_support'),
+      subtitle: context.tr('faqs_contact'),
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const HelpSupportScreen()),
@@ -331,8 +344,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       icon: Icons.feedback_rounded,
       iconColor: AppColors.moduleAcademy,
-      title: 'Send Feedback',
-      subtitle: 'Share your thoughts',
+      title: context.tr('send_feedback'),
+      subtitle: context.tr('share_thoughts'),
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const HelpSupportScreen()),
@@ -345,16 +358,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       icon: Icons.info_rounded,
       iconColor: AppColors.moduleCodeLab,
-      title: 'About LearnNova',
-      subtitle: 'Version 1.0.0',
+      title: context.tr('about_learnnova'),
+      subtitle: context.tr('version_info'),
       onTap: () => _showAboutDialog(context),
     ),
     _settingsTile(
       context: context,
       icon: Icons.star_rounded,
       iconColor: AppColors.accent,
-      title: 'Rate Us',
-      subtitle: 'Love the app? Leave a review!',
+      title: context.tr('rate_us'),
+      subtitle: context.tr('rate_us_desc'),
       onTap: () {},
     ),
   ];
@@ -497,14 +510,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: AppColors.error.withValues(alpha: 0.3), width: 1.5),
           ),
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.logout_rounded, color: AppColors.error, size: 20),
-              SizedBox(width: 8),
+              const Icon(Icons.logout_rounded, color: AppColors.error, size: 20),
+              const SizedBox(width: 8),
               Text(
-                'Log Out',
-                style: TextStyle(
+                context.tr('logout'),
+                style: const TextStyle(
                   color: AppColors.error,
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
@@ -520,7 +533,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _showComingSoon(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('🚧 Coming soon!'),
+        content: Text('🚧 ${context.tr('coming_soon')}'),
         backgroundColor: AppColors.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -558,13 +571,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
         content: Text(
-          'LearnNova v1.0.0\n\nLearn Smarter, Grow Faster.\n\nA modern educational platform designed to make learning engaging, effective, and fun.',
+          context.tr('about_desc'),
           style: TextStyle(color: colors.textSecondary, height: 1.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close', style: TextStyle(color: AppColors.primary)),
+            child: Text(context.tr('close'), style: const TextStyle(color: AppColors.primary)),
           ),
         ],
       ),
@@ -578,15 +591,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (_) => AlertDialog(
         backgroundColor: colors.cardBg,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Log Out?', style: TextStyle(color: colors.textPrimary)),
+        title: Text(context.tr('logout_question'), style: TextStyle(color: colors.textPrimary)),
         content: Text(
-          'Are you sure you want to log out of LearnNova?',
+          context.tr('logout_confirm'),
           style: TextStyle(color: colors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: colors.textSecondary)),
+            child: Text(context.tr('cancel'), style: TextStyle(color: colors.textSecondary)),
           ),
           TextButton(
             onPressed: () async {
@@ -595,7 +608,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               // automatically rebuild and show the LoginScreen.
               await FirebaseAuthService().signOut();
             },
-            child: const Text('Log Out', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w700)),
+            child: Text(context.tr('logout'), style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
